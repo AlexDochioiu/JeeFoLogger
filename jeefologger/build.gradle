@@ -39,10 +39,10 @@ dependencies {
 
 ext {
     bintrayRepo = 'JLogger' // your repo name
-    bintrayName = 'JeeFoLogger' // has to be same as your library module name
+    bintrayName = 'jeefologger' // has to be same as your library module name
     publishedGroupId = 'com.jeefo.android' // your module package name
-    libraryName = 'JeeFoLogger'
-    artifact = 'JeeFoLogger' // has to be same as your library module name
+    libraryName = 'jeefologger'
+    artifact = 'jeefologger' // has to be same as your library module name
     libraryDescription = 'Logging library for android which provides the scope dimension for tracing log messages and their sources. It also provides the possibility of adding persistence to all the log messages as well as sticky tags which would appear in every message'
     siteUrl = 'https://github.com/AlexDochioiu/Logger'
     gitUrl = 'https://github.com/AlexDochioiu/Logger.git'
