@@ -19,9 +19,10 @@ package com.jeefo.android.logger;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
-import com.jeefo.android.log.ILog;
-import com.jeefo.android.log.JeefoLogger;
-import com.jeefo.android.log.ScopedLogger;
+import com.jeefo.android.jeefologger.ILog;
+import com.jeefo.android.jeefologger.JeefoLogger;
+import com.jeefo.android.jeefologger.ScopedLogger;
+
 
 public class MainActivity extends AppCompatActivity {
     private ILog logger = new ScopedLogger(getClass());
@@ -45,5 +46,12 @@ public class MainActivity extends AppCompatActivity {
 
         ILog secondNewLog = new ScopedLogger(newLog, InternalError.class, false);
         secondNewLog.Debug("Added another logger with no instance");
+        secondNewLog.Error("Encountered %d errors while doing %s for %f seconds", 0, "nothing", 3.0f);
+        secondNewLog.Info("Message with fucked up placeholders: %s");
+        secondNewLog.Info("Message with fucked up placeholders again: %d", "StringArgInsteadOfInt");
+        secondNewLog.Error("Message with more placeholders than args %s %s", "onlyArg");
+
+        //acceptable message as the string.format works
+        secondNewLog.Info("Message with placeholders which will not be displayed. %s", "whatever", 2, 3.2, logger);
     }
 }
