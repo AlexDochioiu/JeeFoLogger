@@ -19,8 +19,6 @@ package com.jeefo.android.jeefologger;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import java.lang.reflect.InvocationTargetException;
-
 
 /**
  * Created by Alexandru Iustin Dochioiu on 13/12/17.
@@ -34,7 +32,7 @@ import java.lang.reflect.InvocationTargetException;
 @SuppressWarnings("WeakerAccess")
 public class ScopedLogger extends AbstractScopedLogger {
 
-    private ILog logger;
+    static final int DEPTH_PER_INSTANCE = 3;
 
     /**
      * Constructor used for initializing a completely new {@link ScopedLogger} which will (ideally)
@@ -141,19 +139,9 @@ public class ScopedLogger extends AbstractScopedLogger {
      */
     @Override
     public synchronized void Debug(String messageToLog, Object... args) {
-        validateDepth(2);
+        validateDepth(DEPTH_PER_INSTANCE);
 
-        try {
-            logger.getClass().getDeclaredMethod("DebugReflection", String.class, Object[].class).invoke(logger, messageToLog, args);
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        } catch (InvocationTargetException e) {
-            e.printStackTrace();
-        } catch (NoSuchMethodException e) {
-            e.printStackTrace();
-        }
-
-        logger.Debug(getLoggingPrefix() + messageToLog, args);
+        DebugReflection(messageToLog, args);
     }
 
     /**
@@ -165,8 +153,9 @@ public class ScopedLogger extends AbstractScopedLogger {
      */
     @Override
     public synchronized void Debug(Exception exception, String messageToLog, Object... args) {
-        validateDepth(2);
-        logger.Debug(exception, getLoggingPrefix() + messageToLog, args);
+        validateDepth(DEPTH_PER_INSTANCE);
+
+        DebugReflection(exception, messageToLog, args);
     }
 
     /**
@@ -177,8 +166,9 @@ public class ScopedLogger extends AbstractScopedLogger {
      */
     @Override
     public synchronized void Info(String messageToLog, Object... args) {
-        validateDepth(2);
-        logger.Info(getLoggingPrefix() + messageToLog, args);
+        validateDepth(DEPTH_PER_INSTANCE);
+
+        InfoReflection(messageToLog, args);
     }
 
     /**
@@ -189,8 +179,9 @@ public class ScopedLogger extends AbstractScopedLogger {
      */
     @Override
     public synchronized void Warn(String messageToLog, Object... args) {
-        validateDepth(2);
-        logger.Warn(getLoggingPrefix() + messageToLog, args);
+        validateDepth(DEPTH_PER_INSTANCE);
+
+        WarnReflection(messageToLog, args);
     }
 
     /**
@@ -202,8 +193,9 @@ public class ScopedLogger extends AbstractScopedLogger {
      */
     @Override
     public synchronized void Warn(Exception exception, String messageToLog, Object... args) {
-        validateDepth(2);
-        logger.Warn(exception, getLoggingPrefix() + messageToLog, args);
+        validateDepth(DEPTH_PER_INSTANCE);
+
+        WarnReflection(exception, messageToLog, args);
     }
 
     /**
@@ -214,8 +206,9 @@ public class ScopedLogger extends AbstractScopedLogger {
      */
     @Override
     public synchronized void Error(String messageToLog, Object... args) {
-        validateDepth(2);
-        logger.Error(getLoggingPrefix() + messageToLog, args);
+        validateDepth(DEPTH_PER_INSTANCE);
+
+        ErrorReflection(messageToLog, args);
     }
 
     /**
@@ -227,8 +220,9 @@ public class ScopedLogger extends AbstractScopedLogger {
      */
     @Override
     public synchronized void Error(Exception exception, String messageToLog, Object... args) {
-        validateDepth(2);
-        logger.Error(exception, getLoggingPrefix() + messageToLog, args);
+        validateDepth(DEPTH_PER_INSTANCE);
+
+        ErrorReflection(exception, messageToLog, args);
     }
 
     /**
@@ -238,47 +232,13 @@ public class ScopedLogger extends AbstractScopedLogger {
      */
     @Override
     public synchronized void Error(Exception exception) {
-        validateDepth(2);
-        logger.Error(exception, getLoggingPrefix());
+        validateDepth(DEPTH_PER_INSTANCE);
+
+        ErrorReflection(exception, "");
     }
 
     @Override
-    synchronized void DebugReflection(String messageToLog, Object... args) {
-        logger.Debug(getLoggingPrefix() + messageToLog, args);
-    }
-
-    @Override
-    synchronized void DebugReflection(Exception exception, String messageToLog, Object... args) {
-        logger.Debug(exception, getLoggingPrefix() + messageToLog, args);
-    }
-
-    @Override
-    synchronized void InfoReflection(String messageToLog, Object... args) {
-        logger.Info(getLoggingPrefix() + messageToLog, args);
-    }
-
-    @Override
-    synchronized void WarnReflection(String messageToLog, Object... args) {
-        logger.Warn(getLoggingPrefix() + messageToLog, args);
-    }
-
-    @Override
-    synchronized void WarnReflection(Exception exception, String messageToLog, Object... args) {
-        logger.Warn(exception, getLoggingPrefix() + messageToLog, args);
-    }
-
-    @Override
-    synchronized void ErrorReflection(String messageToLog, Object... args) {
-        logger.Error(getLoggingPrefix() + messageToLog, args);
-    }
-
-    @Override
-    synchronized void ErrorReflection(Exception exception, String messageToLog, Object... args) {
-        logger.Error(exception, getLoggingPrefix() + messageToLog, args);
-    }
-
-    @Override
-    synchronized void ErrorReflection(Exception exception) {
-        logger.Error(exception, getLoggingPrefix());
+    String getMessageLogPrefix() {
+        return getLoggingPrefix();
     }
 }

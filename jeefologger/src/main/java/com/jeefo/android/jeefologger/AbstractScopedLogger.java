@@ -18,6 +18,7 @@ package com.jeefo.android.jeefologger;
 
 import android.support.annotation.Nullable;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.Locale;
 
 /**
@@ -31,22 +32,26 @@ abstract class AbstractScopedLogger implements ILog{
     private String loggingPrefix = "";
     protected ILog logger;
 
-    protected int depth = 5;
-
     public final void validateDepth(int extraDepth) {
         if (logger.getClass() == ScopedLogger.class) {
-            ((ScopedLogger) logger).validateDepth(extraDepth + 2);
+            ((ScopedLogger) logger).validateDepth(extraDepth + ScopedLogger.DEPTH_PER_INSTANCE);
         } else {
             if (logger.getClass() == SmartLogger.class) {
-                ((SmartLogger) logger).validateDepth(extraDepth + 1);
-                ((SmartLogger) logger).increaseDepth(extraDepth);
+                ((SmartLogger) logger).validateDepth(extraDepth + SmartLogger.DEPTH_PER_INSTANCE);
+                //((SmartLogger) logger).increaseDepth(extraDepth);
             }
+        }
+
+        if (this.getClass() == SmartLogger.class) {
+            ((SmartLogger) this).increaseDepth(extraDepth);
         }
     }
 
     final String getLoggingPrefix() {
         return loggingPrefix;
     }
+
+    abstract String getMessageLogPrefix();
 
     /**
      * Used for adding tags to the {@link ILog}. The format of the tag: "[KEY VALUE]"
@@ -81,19 +86,87 @@ abstract class AbstractScopedLogger implements ILog{
         }
     }
 
-    abstract void DebugReflection(String messageToLog, Object... args);
+    synchronized void DebugReflection(String messageToLog, Object... args) {
+        try {
+            logger.getClass().getSuperclass().getDeclaredMethod("DebugReflection", String.class, Object[].class).invoke(logger, getMessageLogPrefix() + messageToLog, args);
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (InvocationTargetException e) {
+            e.printStackTrace();
+        } catch (NoSuchMethodException e) {
+            logger.Debug(getMessageLogPrefix() + messageToLog, args);
+        }
+    }
 
-    abstract void DebugReflection(Exception exception, String messageToLog, Object... args);
+    synchronized void DebugReflection(Exception exception, String messageToLog, Object... args) {
+        try {
+            logger.getClass().getSuperclass().getDeclaredMethod("DebugReflection", Exception.class, String.class, Object[].class).invoke(logger, exception, getMessageLogPrefix() + messageToLog, args);
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (InvocationTargetException e) {
+            e.printStackTrace();
+        } catch (NoSuchMethodException e) {
+            logger.Debug(exception, getMessageLogPrefix() + messageToLog, args);
+        }
+    }
 
-    abstract void InfoReflection(String messageToLog, Object... args);
+    synchronized void InfoReflection(String messageToLog, Object... args) {
+        try {
+            logger.getClass().getSuperclass().getDeclaredMethod("InfoReflection", String.class, Object[].class).invoke(logger, getMessageLogPrefix() + messageToLog, args);
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (InvocationTargetException e) {
+            e.printStackTrace();
+        } catch (NoSuchMethodException e) {
+            logger.Info(getMessageLogPrefix() + messageToLog, args);
+        }
+    }
 
-    abstract void WarnReflection(String messageToLog, Object... args);
+    synchronized void WarnReflection(String messageToLog, Object... args) {
+        try {
+            logger.getClass().getSuperclass().getDeclaredMethod("WarnReflection", String.class, Object[].class).invoke(logger, getMessageLogPrefix() + messageToLog, args);
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (InvocationTargetException e) {
+            e.printStackTrace();
+        } catch (NoSuchMethodException e) {
+            logger.Warn(getMessageLogPrefix() + messageToLog, args);
+        }
+    }
 
-    abstract void WarnReflection(Exception exception, String messageToLog, Object... args);
+    synchronized void WarnReflection(Exception exception, String messageToLog, Object... args) {
+        try {
+            logger.getClass().getSuperclass().getDeclaredMethod("WarnReflection", Exception.class, String.class, Object[].class).invoke(logger, exception, getMessageLogPrefix() + messageToLog, args);
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (InvocationTargetException e) {
+            e.printStackTrace();
+        } catch (NoSuchMethodException e) {
+            logger.Warn(exception, getMessageLogPrefix() + messageToLog, args);
+        }
+    }
 
-    abstract void ErrorReflection(String messageToLog, Object... args);
+    synchronized void ErrorReflection(String messageToLog, Object... args) {
+        try {
+            logger.getClass().getSuperclass().getDeclaredMethod("ErrorReflection", String.class, Object[].class).invoke(logger, getMessageLogPrefix() + messageToLog, args);
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (InvocationTargetException e) {
+            e.printStackTrace();
+        } catch (NoSuchMethodException e) {
+            logger.Error(getMessageLogPrefix() + messageToLog, args);
+        }
+    }
 
-    abstract void ErrorReflection(Exception exception, String messageToLog, Object... args);
-
-    abstract void ErrorReflection(Exception exception);
+    synchronized void ErrorReflection(Exception exception, String messageToLog, Object... args) {
+        try {
+            logger.getClass().getSuperclass().getDeclaredMethod("ErrorReflection", Exception.class, String.class, Object[].class).invoke(logger, exception, getMessageLogPrefix() + messageToLog, args);
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (InvocationTargetException e) {
+            e.printStackTrace();
+        } catch (NoSuchMethodException e) {
+            logger.Error(exception, getMessageLogPrefix() + messageToLog, args);
+        }
+    }
 }

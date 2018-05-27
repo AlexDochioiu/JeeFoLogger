@@ -24,12 +24,18 @@ import android.support.annotation.Nullable;
  */
 public class SmartLogger extends AbstractScopedLogger {
 
-    private int depth = 5;
+    static final int DEPTH_PER_INSTANCE = 3;
+    private static final int INITIAL_DEPTH = 3;
+
+    private int depth = INITIAL_DEPTH;
 
     public SmartLogger() {
-        initLogger(null);
+        this(null);
+    }
 
-        validateDepth(1);
+    public SmartLogger(@Nullable ILog logger) {
+        initLogger(logger);
+
         final String classCaller = SmartLoggerUtils.getClassName();
 
         addTag(TAG_KEY_CLASS, classCaller, false);
@@ -37,15 +43,12 @@ public class SmartLogger extends AbstractScopedLogger {
     }
 
     public void increaseDepth(int extraDepth) {
-        depth = 5 + extraDepth;
+        depth = INITIAL_DEPTH + extraDepth;
     }
 
-    private String getLoggingPrefixWithMethod(@Nullable String messageToLog) {
-        if (messageToLog != null) {
-            return String.format("%s[%s %s] %s", getLoggingPrefix(), TAG_KEY_METHOD, SmartLoggerUtils.getMethodName(depth), messageToLog);
-        } else {
-            return String.format("%s[%s %s]", getLoggingPrefix(), TAG_KEY_METHOD, SmartLoggerUtils.getMethodName(depth));
-        }
+    @Override
+    String getMessageLogPrefix() {
+        return String.format("%s[%s %s] ", getLoggingPrefix(), TAG_KEY_METHOD, SmartLoggerUtils.getMethodName(depth));
     }
 
 
@@ -57,7 +60,9 @@ public class SmartLogger extends AbstractScopedLogger {
      */
     @Override
     public synchronized void Debug(String messageToLog, Object... args) {
-        logger.Debug(getLoggingPrefixWithMethod(messageToLog), args);
+        validateDepth(DEPTH_PER_INSTANCE);
+        DebugReflection(messageToLog, args);
+        //logger.Debug(getLoggingPrefixWithMethod(messageToLog), args);
     }
 
     /**
@@ -69,7 +74,9 @@ public class SmartLogger extends AbstractScopedLogger {
      */
     @Override
     public synchronized void Debug(Exception exception, String messageToLog, Object... args) {
-        logger.Debug(exception, getLoggingPrefixWithMethod(messageToLog), args);
+        validateDepth(DEPTH_PER_INSTANCE);
+        DebugReflection(exception, messageToLog, args);
+        //logger.Debug(exception, getLoggingPrefixWithMethod(messageToLog), args);
     }
 
     /**
@@ -80,7 +87,9 @@ public class SmartLogger extends AbstractScopedLogger {
      */
     @Override
     public synchronized void Info(String messageToLog, Object... args) {
-        logger.Info(getLoggingPrefixWithMethod(messageToLog), args);
+        validateDepth(DEPTH_PER_INSTANCE);
+        InfoReflection(messageToLog, args);
+        //logger.Info(getLoggingPrefixWithMethod(messageToLog), args);
     }
 
     /**
@@ -91,7 +100,9 @@ public class SmartLogger extends AbstractScopedLogger {
      */
     @Override
     public synchronized void Warn(String messageToLog, Object... args) {
-        logger.Warn(getLoggingPrefixWithMethod(messageToLog), args);
+        validateDepth(DEPTH_PER_INSTANCE);
+        WarnReflection(messageToLog, args);
+        //logger.Warn(getLoggingPrefixWithMethod(messageToLog), args);
     }
 
     /**
@@ -103,7 +114,9 @@ public class SmartLogger extends AbstractScopedLogger {
      */
     @Override
     public synchronized void Warn(Exception exception, String messageToLog, Object... args) {
-        logger.Warn(exception, getLoggingPrefixWithMethod(messageToLog), args);
+        validateDepth(DEPTH_PER_INSTANCE);
+        WarnReflection(exception, messageToLog, args);
+        //logger.Warn(exception, getLoggingPrefixWithMethod(messageToLog), args);
     }
 
     /**
@@ -114,7 +127,9 @@ public class SmartLogger extends AbstractScopedLogger {
      */
     @Override
     public synchronized void Error(String messageToLog, Object... args) {
-        logger.Error(getLoggingPrefixWithMethod(messageToLog), args);
+        validateDepth(DEPTH_PER_INSTANCE);
+        ErrorReflection(messageToLog, args);
+        //logger.Error(getLoggingPrefixWithMethod(messageToLog), args);
     }
 
     /**
@@ -126,7 +141,9 @@ public class SmartLogger extends AbstractScopedLogger {
      */
     @Override
     public synchronized void Error(Exception exception, String messageToLog, Object... args) {
-        logger.Error(exception, getLoggingPrefixWithMethod(messageToLog), args);
+        validateDepth(DEPTH_PER_INSTANCE);
+        ErrorReflection(exception, messageToLog, args);
+        //logger.Error(exception, getLoggingPrefixWithMethod(messageToLog), args);
     }
 
     /**
@@ -136,38 +153,8 @@ public class SmartLogger extends AbstractScopedLogger {
      */
     @Override
     public synchronized void Error(Exception exception) {
-        logger.Error(exception, getLoggingPrefixWithMethod(null));
-    }
-
-    synchronized void DebugReflection(String messageToLog, Object... args) {
-        logger.Debug(getLoggingPrefix() + messageToLog, args);
-    }
-
-    synchronized void DebugReflection(Exception exception, String messageToLog, Object... args) {
-        logger.Debug(exception, getLoggingPrefix() + messageToLog, args);
-    }
-
-    synchronized void InfoReflection(String messageToLog, Object... args) {
-        logger.Info(getLoggingPrefix() + messageToLog, args);
-    }
-
-    synchronized void WarnReflection(String messageToLog, Object... args) {
-        logger.Warn(getLoggingPrefix() + messageToLog, args);
-    }
-
-    synchronized void WarnReflection(Exception exception, String messageToLog, Object... args) {
-        logger.Warn(exception, getLoggingPrefix() + messageToLog, args);
-    }
-
-    synchronized void ErrorReflection(String messageToLog, Object... args) {
-        logger.Error(getLoggingPrefix() + messageToLog, args);
-    }
-
-    synchronized void ErrorReflection(Exception exception, String messageToLog, Object... args) {
-        logger.Error(exception, getLoggingPrefix() + messageToLog, args);
-    }
-
-    synchronized void ErrorReflection(Exception exception) {
-        logger.Error(exception, getLoggingPrefix());
+        validateDepth(DEPTH_PER_INSTANCE);
+        ErrorReflection(exception, "");
+        //logger.Error(exception, getLoggingPrefixWithMethod(null));
     }
 }

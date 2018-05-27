@@ -37,7 +37,10 @@ public class MainActivity extends AppCompatActivity {
         logger.Info("Info message with param: %s", "param");
         logger.Warn("Warn message");
 
-        JeefoLogger.initPersistence(this);
+        ILog newSmartLogger = new SmartLogger(logger);
+        newSmartLogger.Info("Now we're fucked");
+
+        //JeefoLogger.initPersistence(this);
 
         logger.Error(new IllegalArgumentException("ArgExc"));
         logger.Warn(new IllegalStateException("exc"), "Exception added: %s", "IllegalStateExc");
@@ -45,19 +48,19 @@ public class MainActivity extends AppCompatActivity {
         ILog newLog = new ScopedLogger(logger, String.class, true);
         newLog.Info("Added second class to trace");
 
-        JeefoLogger.addPersistentTag("USER", "username");
+        //JeefoLogger.addPersistentTag("USER", "username");
 
         ILog secondNewLog = new ScopedLogger(newLog, InternalError.class, false);
         secondNewLog.Debug("Added another logger with no instance");
         secondNewLog.Error("Encountered %d errors while doing %s for %f seconds", 0, "nothing", 3.0f);
-        String loggedTagUid = JeefoLogger.addPersistentTag("LOGGED", "FACEBOOK");
-        JeefoLogger.addPersistentTag("LOGGED", "SAME_KEY");
+        //String loggedTagUid = JeefoLogger.addPersistentTag("LOGGED", "FACEBOOK");
+        //JeefoLogger.addPersistentTag("LOGGED", "SAME_KEY");
         secondNewLog.Info("Message with fucked up placeholders: %s");
         secondNewLog.Warn("Message with fucked up placeholders again: %d", "StringArgInsteadOfInt");
-        JeefoLogger.removeAllPersistentTagsFromKey("LOGGED");
+        //JeefoLogger.removeAllPersistentTagsFromKey("LOGGED");
         secondNewLog.Error("Message with more placeholders than args %s %s", "onlyArg");
 
-        logger.Error("Screwed up depth");
+        logger.Warn("Screwed up depth??");
 
 
         //acceptable message as the string.format works
