@@ -19,8 +19,6 @@ package com.jeefo.android.jeefologger;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import java.util.Locale;
-
 
 /**
  * Created by Alexandru Iustin Dochioiu on 13/12/17.
@@ -32,14 +30,9 @@ import java.util.Locale;
  * It logs all the messages to Logcat as well as to a persistent file (if activated).
  */
 @SuppressWarnings("WeakerAccess")
-public class ScopedLogger implements ILog {
+public class ScopedLogger extends AbstractScopedLogger {
 
-    private final static String TAG_KEY_INSTANCE = "Instance";
-    private final static String TAG_KEY_CLASS = "Class";
-    private final static String TAG_KEY_METHOD = "Method";
-
-    private String loggingPrefix = "";
-    private ILog logger;
+    static final int DEPTH_PER_INSTANCE = 3;
 
     /**
      * Constructor used for initializing a completely new {@link ScopedLogger} which will (ideally)
@@ -100,6 +93,7 @@ public class ScopedLogger implements ILog {
      */
     @SuppressWarnings("ConstantConditions")
     public ScopedLogger(@Nullable ILog logger, @NonNull Class classCaller, @Nullable String method) {
+        super();
         if (classCaller == null) {
             throw new IllegalArgumentException("classCaller should not be null");
         }
@@ -126,6 +120,7 @@ public class ScopedLogger implements ILog {
      */
     @SuppressWarnings("ConstantConditions")
     public ScopedLogger(@NonNull ILog logger, @NonNull String method) {
+        super();
         if (logger == null) {
             throw new IllegalArgumentException("logger should not be null");
         }
@@ -139,39 +134,6 @@ public class ScopedLogger implements ILog {
     }
 
     /**
-     * Used for adding tags to the {@link ILog}. The format of the tag: "[KEY VALUE]"
-     *
-     * @param key                     the {@link String} matching the KEY field
-     * @param value                   the {@link String} matching the VALUE field
-     * @param throwOnNullOrEmptyValue boolean indicating whether a null value param is acceptable
-     */
-    @SuppressWarnings("SameParameterValue")
-    private synchronized void addTag(String key, String value, boolean throwOnNullOrEmptyValue) {
-        if (value == null || value.equals("")) {
-            if (throwOnNullOrEmptyValue) {
-                throw new IllegalArgumentException("value should be non-null, non-empty string");
-            } else {
-                return;
-            }
-        }
-        loggingPrefix += String.format(Locale.UK, "[%s %s]", key, value);
-    }
-
-    /**
-     * Used for initiating the {@link ILog} member using the passed param if not null; otherwise
-     * a new {@link JeefoLogger} is created
-     *
-     * @param logger the {@link ILog} to be stored or null to create a new instance of {@link JeefoLogger}
-     */
-    private synchronized void initLogger(@Nullable ILog logger) {
-        if (logger == null) {
-            this.logger = new JeefoLogger();
-        } else {
-            this.logger = logger;
-        }
-    }
-
-    /**
      * {@inheritDoc}
      *
      * @param messageToLog the message to be logged
@@ -179,7 +141,7 @@ public class ScopedLogger implements ILog {
      */
     @Override
     public synchronized void Debug(String messageToLog, Object... args) {
-        logger.Debug(loggingPrefix + " " + messageToLog, args);
+        DebugReflection(messageToLog, args);
     }
 
     /**
@@ -191,7 +153,7 @@ public class ScopedLogger implements ILog {
      */
     @Override
     public synchronized void Debug(Exception exception, String messageToLog, Object... args) {
-        logger.Debug(exception, loggingPrefix + " " + messageToLog, args);
+        DebugReflection(exception, messageToLog, args);
     }
 
     /**
@@ -202,7 +164,7 @@ public class ScopedLogger implements ILog {
      */
     @Override
     public synchronized void Info(String messageToLog, Object... args) {
-        logger.Info(loggingPrefix + " " + messageToLog, args);
+        InfoReflection(messageToLog, args);
     }
 
     /**
@@ -213,7 +175,7 @@ public class ScopedLogger implements ILog {
      */
     @Override
     public synchronized void Warn(String messageToLog, Object... args) {
-        logger.Warn(loggingPrefix + " " + messageToLog, args);
+        WarnReflection(messageToLog, args);
     }
 
     /**
@@ -225,7 +187,7 @@ public class ScopedLogger implements ILog {
      */
     @Override
     public synchronized void Warn(Exception exception, String messageToLog, Object... args) {
-        logger.Warn(exception, loggingPrefix + " " + messageToLog, args);
+        WarnReflection(exception, messageToLog, args);
     }
 
     /**
@@ -236,7 +198,7 @@ public class ScopedLogger implements ILog {
      */
     @Override
     public synchronized void Error(String messageToLog, Object... args) {
-        logger.Error(loggingPrefix + " " + messageToLog, args);
+        ErrorReflection(messageToLog, args);
     }
 
     /**
@@ -248,7 +210,7 @@ public class ScopedLogger implements ILog {
      */
     @Override
     public synchronized void Error(Exception exception, String messageToLog, Object... args) {
-        logger.Error(exception, loggingPrefix + " " + messageToLog, args);
+        ErrorReflection(exception, messageToLog, args);
     }
 
     /**
@@ -258,6 +220,11 @@ public class ScopedLogger implements ILog {
      */
     @Override
     public synchronized void Error(Exception exception) {
-        logger.Error(exception, loggingPrefix);
+        ErrorReflection(exception, "");
+    }
+
+    @Override
+    String getMessageLogPrefix() {
+        return getLoggingPrefix();
     }
 }

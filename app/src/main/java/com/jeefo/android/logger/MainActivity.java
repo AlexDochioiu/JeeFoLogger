@@ -20,44 +20,57 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
 import com.jeefo.android.jeefologger.ILog;
-import com.jeefo.android.jeefologger.JeefoLogger;
-import com.jeefo.android.jeefologger.ScopedLogger;
+import com.jeefo.android.jeefologger.SmartLogger;
+import com.jeefo.android.logger.utils.SimpleUtils;
 
 
 public class MainActivity extends AppCompatActivity {
-    private ILog logger = new ScopedLogger(getClass());
+    private ILog logger = new SmartLogger();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        logger.Debug("This is a debug message");
-        logger.Info("Info message with param: %s", "param");
-        logger.Warn("Warn message");
+        SimpleClassWithPassedLog classOne = new SimpleClassWithPassedLog(logger);
+        classOne.tellMeSomethingNasty();
 
-        JeefoLogger.initPersistence(this);
+        SimpleClassWithInstantiatedLog classTwo = new SimpleClassWithInstantiatedLog();
+        classTwo.tellMeSomethingNice();
 
-        logger.Error(new IllegalArgumentException("ArgExc"));
-        logger.Warn(new IllegalStateException("exc"), "Exception added: %s", "IllegalStateExc");
+        SimpleUtils.printMeALog(logger);
 
-        ILog newLog = new ScopedLogger(logger, String.class, true);
-        newLog.Info("Added second class to trace");
-
-        JeefoLogger.addPersistentTag("USER", "username");
-
-        ILog secondNewLog = new ScopedLogger(newLog, InternalError.class, false);
-        secondNewLog.Debug("Added another logger with no instance");
-        secondNewLog.Error("Encountered %d errors while doing %s for %f seconds", 0, "nothing", 3.0f);
-        String loggedTagUid = JeefoLogger.addPersistentTag("LOGGED", "FACEBOOK");
-        JeefoLogger.addPersistentTag("LOGGED", "SAME_KEY");
-        secondNewLog.Info("Message with fucked up placeholders: %s");
-        secondNewLog.Warn("Message with fucked up placeholders again: %d", "StringArgInsteadOfInt");
-        JeefoLogger.removeAllPersistentTagsFromKey("LOGGED");
-        secondNewLog.Error("Message with more placeholders than args %s %s", "onlyArg");
-
-
-        //acceptable message as the string.format works
-        secondNewLog.Info("Message with placeholders which will not be displayed. %s", "whatever", 2, 3.2, logger);
+//        logger.Debug("This is a debug message");
+//        logger.Info("Info message with param: %s", "param");
+//        logger.Warn("Warn message");
+//
+//        ILog newSmartLogger = new SmartLogger(logger);
+//        newSmartLogger.Info("Now we're fucked");
+//
+//        //JeefoLogger.initPersistence(this);
+//
+//        logger.Error(new IllegalArgumentException("ArgExc"));
+//        logger.Warn(new IllegalStateException("exc"), "Exception added: %s", "IllegalStateExc");
+//
+//        ILog newLog = new ScopedLogger(logger, String.class, true);
+//        newLog.Info("Added second class to trace");
+//
+//        //JeefoLogger.addPersistentTag("USER", "username");
+//
+//        ILog secondNewLog = new ScopedLogger(newLog, InternalError.class, false);
+//        secondNewLog.Debug("Added another logger with no instance");
+//        secondNewLog.Error("Encountered %d errors while doing %s for %f seconds", 0, "nothing", 3.0f);
+//        //String loggedTagUid = JeefoLogger.addPersistentTag("LOGGED", "FACEBOOK");
+//        //JeefoLogger.addPersistentTag("LOGGED", "SAME_KEY");
+//        secondNewLog.Info("Message with fucked up placeholders: %s");
+//        secondNewLog.Warn("Message with fucked up placeholders again: %d", "StringArgInsteadOfInt");
+//        //JeefoLogger.removeAllPersistentTagsFromKey("LOGGED");
+//        secondNewLog.Error("Message with more placeholders than args %s %s", "onlyArg");
+//
+//        logger.Warn("Screwed up depth??");
+//
+//
+//        //acceptable message as the string.format works
+//        secondNewLog.Info("Message with placeholders which will not be displayed. %s", "whatever", 2, 3.2, logger);
     }
 }
