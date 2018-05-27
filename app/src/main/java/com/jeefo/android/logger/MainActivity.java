@@ -44,12 +44,18 @@ public class MainActivity extends AppCompatActivity {
         ILog newLog = new ScopedLogger(logger, String.class, true);
         newLog.Info("Added second class to trace");
 
+        JeefoLogger.addPersistentTag("USER", "username");
+
         ILog secondNewLog = new ScopedLogger(newLog, InternalError.class, false);
         secondNewLog.Debug("Added another logger with no instance");
         secondNewLog.Error("Encountered %d errors while doing %s for %f seconds", 0, "nothing", 3.0f);
+        String loggedTagUid = JeefoLogger.addPersistentTag("LOGGED", "FACEBOOK");
+        JeefoLogger.addPersistentTag("LOGGED", "SAME_KEY");
         secondNewLog.Info("Message with fucked up placeholders: %s");
-        secondNewLog.Info("Message with fucked up placeholders again: %d", "StringArgInsteadOfInt");
+        secondNewLog.Warn("Message with fucked up placeholders again: %d", "StringArgInsteadOfInt");
+        JeefoLogger.removeAllPersistentTagsFromKey("LOGGED");
         secondNewLog.Error("Message with more placeholders than args %s %s", "onlyArg");
+
 
         //acceptable message as the string.format works
         secondNewLog.Info("Message with placeholders which will not be displayed. %s", "whatever", 2, 3.2, logger);

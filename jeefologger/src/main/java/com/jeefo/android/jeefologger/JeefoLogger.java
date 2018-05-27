@@ -18,6 +18,7 @@ package com.jeefo.android.jeefologger;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.util.Log;
 
 import static com.jeefo.android.jeefologger.StringUtils.getFormattedMessage;
@@ -26,15 +27,14 @@ import static com.jeefo.android.jeefologger.StringUtils.getFormattedMessage;
  * Created by Alexandru Iustin Dochioiu on 02/01/18.
  */
 @SuppressWarnings("WeakerAccess")
-public class JeefoLogger implements ITaggableLog {
+public class JeefoLogger implements ILog {
 
-    public static final int TAG_ID_NOT_FOUND = 10;
-    public static final int TAG_NOT_REMOVED = 11;
-    public static final int TAG_REMOVED = 12;
+    public static final int TAG_ID_NOT_FOUND = PersistentTagsManager.TAG_ID_NOT_FOUND;
+    public static final int TAG_ID_IS_NULL = PersistentTagsManager.TAG_ID_IS_NULL;
+    public static final int TAG_REMOVED = PersistentTagsManager.TAG_REMOVED;
 
     private static final ILog persistentLogger = new PersistentLogger();
     public static final String loggingPrefix = "[JeeFo-Log]";
-    private static String userPrefix = "";
 
     /**
      * Public method used for initializing persistence. If persistence is not desired, do not
@@ -42,7 +42,7 @@ public class JeefoLogger implements ITaggableLog {
      *
      * @param context the Application Context.
      * @throws IllegalArgumentException if the context is null and the persistence has not
-     *                                   already been initialized
+     *                                  already been initialized
      */
     public static void initPersistence(@NonNull Context context) {
         PersistentLogger.init(context);
@@ -51,107 +51,103 @@ public class JeefoLogger implements ITaggableLog {
     @Override
     public void Debug(String messageToLog, Object... args) {
         String finalMessage = getFormattedMessage(null, messageToLog, args);
-        Log.d(loggingPrefix+userPrefix, finalMessage);
+        Log.d(loggingPrefix + PersistentTagsManager.getTagsStringPrefix(), finalMessage);
         persistentLogger.Debug(finalMessage);
     }
 
     @Override
     public void Debug(Exception exception, String messageToLog, Object... args) {
         String finalMessage = getFormattedMessage(exception, messageToLog, args);
-        Log.d(loggingPrefix+userPrefix, finalMessage);
+        Log.d(loggingPrefix + PersistentTagsManager.getTagsStringPrefix(), finalMessage);
         persistentLogger.Debug(finalMessage);
     }
 
     @Override
     public void Info(String messageToLog, Object... args) {
         String finalMessage = getFormattedMessage(null, messageToLog, args);
-        Log.i(loggingPrefix+userPrefix, finalMessage);
+        Log.i(loggingPrefix + PersistentTagsManager.getTagsStringPrefix(), finalMessage);
         persistentLogger.Info(finalMessage);
     }
 
     @Override
     public void Warn(String messageToLog, Object... args) {
         String finalMessage = getFormattedMessage(null, messageToLog, args);
-        Log.w(loggingPrefix+userPrefix, finalMessage);
+        Log.w(loggingPrefix + PersistentTagsManager.getTagsStringPrefix(), finalMessage);
         persistentLogger.Warn(finalMessage);
     }
 
     @Override
     public void Warn(Exception exception, String messageToLog, Object... args) {
         String finalMessage = getFormattedMessage(exception, messageToLog, args);
-        Log.w(loggingPrefix+userPrefix, finalMessage);
+        Log.w(loggingPrefix + PersistentTagsManager.getTagsStringPrefix(), finalMessage);
         persistentLogger.Warn(finalMessage);
     }
 
     @Override
     public void Error(String messageToLog, Object... args) {
         String finalMessage = getFormattedMessage(null, messageToLog, args);
-        Log.e(loggingPrefix+userPrefix, finalMessage);
+        Log.e(loggingPrefix + PersistentTagsManager.getTagsStringPrefix(), finalMessage);
         persistentLogger.Error(finalMessage);
     }
 
     @Override
     public void Error(Exception exception, String messageToLog, Object... args) {
         String finalMessage = getFormattedMessage(exception, messageToLog, args);
-        Log.e(loggingPrefix+userPrefix, finalMessage);
+        Log.e(loggingPrefix + PersistentTagsManager.getTagsStringPrefix(), finalMessage);
         persistentLogger.Error(finalMessage);
     }
 
     @Override
     public void Error(Exception exception) {
-        Log.e(loggingPrefix+userPrefix, getFormattedMessage(exception, null));
+        Log.e(loggingPrefix + PersistentTagsManager.getTagsStringPrefix(), getFormattedMessage(exception, null));
         persistentLogger.Error(exception);
     }
 
-
-
-    public static void setLoggedUserTag(String uid) {
-        userPrefix = String.format("[USER %s]", uid);
-    }
-    public static void removeLoggedUserTag() {
-        userPrefix = "";
-    }
-
     /**
-     * {@inheritDoc}
-     * @param key The string param which will represent the KEY in the tag. There is NO REQUIREMENT
-     *            for it to be unique.
+     * Used for adding a global persistent tag which will stick to all log messages on all threads.
+     * This will look something like "[KEY VALUE]" in the log messages and will appear before the
+     * Scope Tags
+     * NOTE: this will apply to the ScopedLoggers already instantiated as well
+     *
+     * @param key   The string param which will represent the KEY in the tag. There is NO REQUIREMENT
+     *              for it to be unique.
      * @param value The string param which will represent the VALUE in the tag.
-     * @return {@inheritDoc}
+     * @return a {@link String} unique identifier which can be used to remove the newly added tag
+     * OR null if any parameter is null
      */
-    @Override
-    public String addPersistentTag(String key, String value) {
-        return null;
+    @Nullable
+    public static String addPersistentTag(String key, String value) {
+        return PersistentTagsManager.addPersistentTag(key, value);
     }
 
     /**
-     * {@inheritDoc}
+     * Used for removing ALL the persistent tags having a particular {@link String} as the key
+     *
      * @param key the (case-sensitive) key we are looking for in order to remove the tags
-     * @return {@inheritDoc}
+     * @return the number of tags that were removed based on the given key; 0 if the key is null
      */
-    @Override
-    public int removePersistentTagsFromKey(String key) {
-        return 0;
+    public static int removeAllPersistentTagsFromKey(String key) {
+        return PersistentTagsManager.removeAllPersistentTagsFromKey(key);
     }
 
     /**
-     * {@inheritDoc}
+     * Used for removing a particular persistent tag
+     *
      * @param uniqueTagIdentifier the {@link String} unique identifier for the tag to be remove
      * @return {@value TAG_ID_NOT_FOUND} if the {@link String} identifier is not known;
-     *          {@value TAG_NOT_REMOVED} if for any reason the operation could not be performed;
-     *          {@value TAG_REMOVED} if the tag was successfully removed
+     * {@value TAG_ID_IS_NULL} if the parameter is null;
+     * {@value TAG_REMOVED} if the tag was successfully removed
      */
-    @Override
-    public int removePersistentTag(String uniqueTagIdentifier) {
-        return 0;
+    public static int removePersistentTag(String uniqueTagIdentifier) {
+        return PersistentTagsManager.removePersistentTag(uniqueTagIdentifier);
     }
 
     /**
-     * {@inheritDoc}
-     * @return {@inheritDoc}
+     * Used for removing all the persistent tags
+     *
+     * @return the number of tags removed
      */
-    @Override
-    public int clearPersistentTags() {
-        return 0;
+    public static int clearPersistentTags() {
+        return PersistentTagsManager.clearPersistentTags();
     }
 }
