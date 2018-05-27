@@ -93,6 +93,7 @@ public class ScopedLogger extends AbstractScopedLogger {
      */
     @SuppressWarnings("ConstantConditions")
     public ScopedLogger(@Nullable ILog logger, @NonNull Class classCaller, @Nullable String method) {
+        super();
         if (classCaller == null) {
             throw new IllegalArgumentException("classCaller should not be null");
         }
@@ -119,6 +120,7 @@ public class ScopedLogger extends AbstractScopedLogger {
      */
     @SuppressWarnings("ConstantConditions")
     public ScopedLogger(@NonNull ILog logger, @NonNull String method) {
+        super();
         if (logger == null) {
             throw new IllegalArgumentException("logger should not be null");
         }
@@ -139,8 +141,6 @@ public class ScopedLogger extends AbstractScopedLogger {
      */
     @Override
     public synchronized void Debug(String messageToLog, Object... args) {
-        validateDepth(DEPTH_PER_INSTANCE);
-
         DebugReflection(messageToLog, args);
     }
 
@@ -153,8 +153,6 @@ public class ScopedLogger extends AbstractScopedLogger {
      */
     @Override
     public synchronized void Debug(Exception exception, String messageToLog, Object... args) {
-        validateDepth(DEPTH_PER_INSTANCE);
-
         DebugReflection(exception, messageToLog, args);
     }
 
@@ -166,8 +164,6 @@ public class ScopedLogger extends AbstractScopedLogger {
      */
     @Override
     public synchronized void Info(String messageToLog, Object... args) {
-        validateDepth(DEPTH_PER_INSTANCE);
-
         InfoReflection(messageToLog, args);
     }
 
@@ -179,8 +175,6 @@ public class ScopedLogger extends AbstractScopedLogger {
      */
     @Override
     public synchronized void Warn(String messageToLog, Object... args) {
-        validateDepth(DEPTH_PER_INSTANCE);
-
         WarnReflection(messageToLog, args);
     }
 
@@ -193,8 +187,6 @@ public class ScopedLogger extends AbstractScopedLogger {
      */
     @Override
     public synchronized void Warn(Exception exception, String messageToLog, Object... args) {
-        validateDepth(DEPTH_PER_INSTANCE);
-
         WarnReflection(exception, messageToLog, args);
     }
 
@@ -206,8 +198,6 @@ public class ScopedLogger extends AbstractScopedLogger {
      */
     @Override
     public synchronized void Error(String messageToLog, Object... args) {
-        validateDepth(DEPTH_PER_INSTANCE);
-
         ErrorReflection(messageToLog, args);
     }
 
@@ -220,8 +210,6 @@ public class ScopedLogger extends AbstractScopedLogger {
      */
     @Override
     public synchronized void Error(Exception exception, String messageToLog, Object... args) {
-        validateDepth(DEPTH_PER_INSTANCE);
-
         ErrorReflection(exception, messageToLog, args);
     }
 
@@ -232,8 +220,6 @@ public class ScopedLogger extends AbstractScopedLogger {
      */
     @Override
     public synchronized void Error(Exception exception) {
-        validateDepth(DEPTH_PER_INSTANCE);
-
         ErrorReflection(exception, "");
     }
 

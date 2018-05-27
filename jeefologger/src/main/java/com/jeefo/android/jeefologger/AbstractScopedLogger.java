@@ -32,20 +32,22 @@ abstract class AbstractScopedLogger implements ILog{
     private String loggingPrefix = "";
     protected ILog logger;
 
-    public final void validateDepth(int extraDepth) {
-        if (logger.getClass() == ScopedLogger.class) {
-            ((ScopedLogger) logger).validateDepth(extraDepth + ScopedLogger.DEPTH_PER_INSTANCE);
-        } else {
-            if (logger.getClass() == SmartLogger.class) {
-                ((SmartLogger) logger).validateDepth(extraDepth + SmartLogger.DEPTH_PER_INSTANCE);
-                //((SmartLogger) logger).increaseDepth(extraDepth);
-            }
-        }
+    // required when we search for the method call, use full name so we avoid big
+    // problems caused by obfuscation
+    public final String fullClassName;
 
-        if (this.getClass() == SmartLogger.class) {
-            ((SmartLogger) this).increaseDepth(extraDepth);
-        }
+
+    AbstractScopedLogger() {
+        this.fullClassName = SmartLoggerUtils.getFullClassName();
     }
+
+//    final int parentsMatchClassName(int currentMatches, String className) {
+//        if (logger.getClass() == JeefoLogger.class) {
+//            return currentMatches;
+//        } else {
+//            return ((AbstractScopedLogger) logger).parentsMatchClassName((fullClassName.equals(className) ? 1 : 0) + currentMatches, className);
+//        }
+//    }
 
     final String getLoggingPrefix() {
         return loggingPrefix;

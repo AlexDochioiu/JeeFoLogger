@@ -41,4 +41,25 @@ class SmartLoggerUtils {
         // return ste[ste.length - depth].getMethodName();  //Wrong, fails for depth = 0
         return ste[depth].getMethodName(); //Thank you Tom Tresansky
     }
+
+    static String getMethodName(String className, int depth)
+    {
+        final StackTraceElement[] ste = Thread.currentThread().getStackTrace();
+
+        for (StackTraceElement traceElement : ste) {
+            if (traceElement.getClassName().matches(className)) {
+                if (--depth == 0) {
+                    return traceElement.getMethodName();
+                }
+            }
+        }
+
+        return "";
+    }
+
+    public static String getFullClassName() {
+        final StackTraceElement[] ste = Thread.currentThread().getStackTrace();
+
+        return ste[5].getClassName();
+    }
 }
