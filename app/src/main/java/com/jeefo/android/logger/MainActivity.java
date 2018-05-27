@@ -22,10 +22,11 @@ import android.os.Bundle;
 import com.jeefo.android.jeefologger.ILog;
 import com.jeefo.android.jeefologger.JeefoLogger;
 import com.jeefo.android.jeefologger.ScopedLogger;
+import com.jeefo.android.jeefologger.SmartLogger;
 
 
 public class MainActivity extends AppCompatActivity {
-    private ILog logger = new ScopedLogger(getClass());
+    private ILog logger = new SmartLogger();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,6 +56,8 @@ public class MainActivity extends AppCompatActivity {
         secondNewLog.Warn("Message with fucked up placeholders again: %d", "StringArgInsteadOfInt");
         JeefoLogger.removeAllPersistentTagsFromKey("LOGGED");
         secondNewLog.Error("Message with more placeholders than args %s %s", "onlyArg");
+
+        logger.Error("Screwed up depth");
 
 
         //acceptable message as the string.format works

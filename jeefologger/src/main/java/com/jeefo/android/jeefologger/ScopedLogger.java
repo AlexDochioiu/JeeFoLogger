@@ -19,7 +19,7 @@ package com.jeefo.android.jeefologger;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import java.util.Locale;
+import java.lang.reflect.InvocationTargetException;
 
 
 /**
@@ -32,13 +32,8 @@ import java.util.Locale;
  * It logs all the messages to Logcat as well as to a persistent file (if activated).
  */
 @SuppressWarnings("WeakerAccess")
-public class ScopedLogger implements ILog {
+public class ScopedLogger extends AbstractScopedLogger {
 
-    private final static String TAG_KEY_INSTANCE = "Instance";
-    private final static String TAG_KEY_CLASS = "Class";
-    private final static String TAG_KEY_METHOD = "Method";
-
-    private String loggingPrefix = "";
     private ILog logger;
 
     /**
@@ -139,39 +134,6 @@ public class ScopedLogger implements ILog {
     }
 
     /**
-     * Used for adding tags to the {@link ILog}. The format of the tag: "[KEY VALUE]"
-     *
-     * @param key                     the {@link String} matching the KEY field
-     * @param value                   the {@link String} matching the VALUE field
-     * @param throwOnNullOrEmptyValue boolean indicating whether a null value param is acceptable
-     */
-    @SuppressWarnings("SameParameterValue")
-    private synchronized void addTag(String key, String value, boolean throwOnNullOrEmptyValue) {
-        if (value == null || value.equals("")) {
-            if (throwOnNullOrEmptyValue) {
-                throw new IllegalArgumentException("value should be non-null, non-empty string");
-            } else {
-                return;
-            }
-        }
-        loggingPrefix += String.format(Locale.UK, "[%s %s]", key, value);
-    }
-
-    /**
-     * Used for initiating the {@link ILog} member using the passed param if not null; otherwise
-     * a new {@link JeefoLogger} is created
-     *
-     * @param logger the {@link ILog} to be stored or null to create a new instance of {@link JeefoLogger}
-     */
-    private synchronized void initLogger(@Nullable ILog logger) {
-        if (logger == null) {
-            this.logger = new JeefoLogger();
-        } else {
-            this.logger = logger;
-        }
-    }
-
-    /**
      * {@inheritDoc}
      *
      * @param messageToLog the message to be logged
@@ -179,7 +141,19 @@ public class ScopedLogger implements ILog {
      */
     @Override
     public synchronized void Debug(String messageToLog, Object... args) {
-        logger.Debug(loggingPrefix + " " + messageToLog, args);
+        validateDepth(2);
+
+        try {
+            logger.getClass().getDeclaredMethod("DebugReflection", String.class, Object[].class).invoke(logger, messageToLog, args);
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (InvocationTargetException e) {
+            e.printStackTrace();
+        } catch (NoSuchMethodException e) {
+            e.printStackTrace();
+        }
+
+        logger.Debug(getLoggingPrefix() + messageToLog, args);
     }
 
     /**
@@ -191,7 +165,8 @@ public class ScopedLogger implements ILog {
      */
     @Override
     public synchronized void Debug(Exception exception, String messageToLog, Object... args) {
-        logger.Debug(exception, loggingPrefix + " " + messageToLog, args);
+        validateDepth(2);
+        logger.Debug(exception, getLoggingPrefix() + messageToLog, args);
     }
 
     /**
@@ -202,7 +177,8 @@ public class ScopedLogger implements ILog {
      */
     @Override
     public synchronized void Info(String messageToLog, Object... args) {
-        logger.Info(loggingPrefix + " " + messageToLog, args);
+        validateDepth(2);
+        logger.Info(getLoggingPrefix() + messageToLog, args);
     }
 
     /**
@@ -213,7 +189,8 @@ public class ScopedLogger implements ILog {
      */
     @Override
     public synchronized void Warn(String messageToLog, Object... args) {
-        logger.Warn(loggingPrefix + " " + messageToLog, args);
+        validateDepth(2);
+        logger.Warn(getLoggingPrefix() + messageToLog, args);
     }
 
     /**
@@ -225,7 +202,8 @@ public class ScopedLogger implements ILog {
      */
     @Override
     public synchronized void Warn(Exception exception, String messageToLog, Object... args) {
-        logger.Warn(exception, loggingPrefix + " " + messageToLog, args);
+        validateDepth(2);
+        logger.Warn(exception, getLoggingPrefix() + messageToLog, args);
     }
 
     /**
@@ -236,7 +214,8 @@ public class ScopedLogger implements ILog {
      */
     @Override
     public synchronized void Error(String messageToLog, Object... args) {
-        logger.Error(loggingPrefix + " " + messageToLog, args);
+        validateDepth(2);
+        logger.Error(getLoggingPrefix() + messageToLog, args);
     }
 
     /**
@@ -248,7 +227,8 @@ public class ScopedLogger implements ILog {
      */
     @Override
     public synchronized void Error(Exception exception, String messageToLog, Object... args) {
-        logger.Error(exception, loggingPrefix + " " + messageToLog, args);
+        validateDepth(2);
+        logger.Error(exception, getLoggingPrefix() + messageToLog, args);
     }
 
     /**
@@ -258,6 +238,47 @@ public class ScopedLogger implements ILog {
      */
     @Override
     public synchronized void Error(Exception exception) {
-        logger.Error(exception, loggingPrefix);
+        validateDepth(2);
+        logger.Error(exception, getLoggingPrefix());
+    }
+
+    @Override
+    synchronized void DebugReflection(String messageToLog, Object... args) {
+        logger.Debug(getLoggingPrefix() + messageToLog, args);
+    }
+
+    @Override
+    synchronized void DebugReflection(Exception exception, String messageToLog, Object... args) {
+        logger.Debug(exception, getLoggingPrefix() + messageToLog, args);
+    }
+
+    @Override
+    synchronized void InfoReflection(String messageToLog, Object... args) {
+        logger.Info(getLoggingPrefix() + messageToLog, args);
+    }
+
+    @Override
+    synchronized void WarnReflection(String messageToLog, Object... args) {
+        logger.Warn(getLoggingPrefix() + messageToLog, args);
+    }
+
+    @Override
+    synchronized void WarnReflection(Exception exception, String messageToLog, Object... args) {
+        logger.Warn(exception, getLoggingPrefix() + messageToLog, args);
+    }
+
+    @Override
+    synchronized void ErrorReflection(String messageToLog, Object... args) {
+        logger.Error(getLoggingPrefix() + messageToLog, args);
+    }
+
+    @Override
+    synchronized void ErrorReflection(Exception exception, String messageToLog, Object... args) {
+        logger.Error(exception, getLoggingPrefix() + messageToLog, args);
+    }
+
+    @Override
+    synchronized void ErrorReflection(Exception exception) {
+        logger.Error(exception, getLoggingPrefix());
     }
 }
