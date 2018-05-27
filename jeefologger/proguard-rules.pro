@@ -19,3 +19,7 @@
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
+
+-keepclassmembers class * extends com.jeefo.android.jeefologger.JeefoLogger{ *; }
+-keepclassmembers class * extends com.jeefo.android.jeefologger.ScopedLogger{ *; }
+-keepclassmembers class * extends com.jeefo.android.jeefologger.PersistentLogger{ *; }

@@ -34,8 +34,7 @@ import java.util.Locale;
  * Created by Alexandru Iustin Dochioiu on 29/01/18.
  */
 
-class PersistentLogger implements ITaggableLog {
-    private static String userPrefix = "";
+class PersistentLogger implements ILog {
     private static boolean wasInitialised = false;
     private static File logFile;
 
@@ -153,7 +152,7 @@ class PersistentLogger implements ITaggableLog {
                     BufferedWriter outStream = new BufferedWriter(logWriter);
                     outStream.write(
                             new SimpleDateFormat("yyyy/MM/dd HH:mm:ss ", Locale.UK).format(new Date()) + type + "/" +
-                                    userPrefix + StringUtils.getFormattedMessage(exception, messageToLog, args) + "\n");
+                                    PersistentTagsManager.getTagsStringPrefix() + StringUtils.getFormattedMessage(exception, messageToLog, args) + "\n");
                     outStream.close();
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -171,41 +170,12 @@ class PersistentLogger implements ITaggableLog {
                     BufferedWriter outStream = new BufferedWriter(logWriter);
                     outStream.write(
                             new SimpleDateFormat("yyyy/MM/dd HH:mm:ss ", Locale.UK).format(new Date()) + type + "/" +
-                                    userPrefix + " EXCEPTION_ONLY :: " + exception.getMessage() + "--" + exception.toString() + "\n");
+                                    PersistentTagsManager.getTagsStringPrefix() + " EXCEPTION_ONLY :: " + exception.getMessage() + "--" + exception.toString() + "\n");
                     outStream.close();
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
             }
         }
-    }
-
-
-    public static void setLoggedUserTag(String uid) {
-        userPrefix = String.format("[USER %s]", uid);
-    }
-
-    public static void removeLoggedUserTag() {
-        userPrefix = "";
-    }
-
-    @Override
-    public String addPersistentTag(String key, String value) {
-        return null;
-    }
-
-    @Override
-    public int removePersistentTagsFromKey(String key) {
-        return 0;
-    }
-
-    @Override
-    public int removePersistentTag(String uniqueTagIdentifier) {
-        return 0;
-    }
-
-    @Override
-    public int clearPersistentTags() {
-        return 0;
     }
 }
