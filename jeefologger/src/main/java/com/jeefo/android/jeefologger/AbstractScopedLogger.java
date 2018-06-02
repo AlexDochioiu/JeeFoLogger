@@ -19,6 +19,7 @@ package com.jeefo.android.jeefologger;
 import android.support.annotation.Nullable;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.LinkedList;
 import java.util.Locale;
 
 /**
@@ -29,25 +30,18 @@ abstract class AbstractScopedLogger implements ILog{
     final static String TAG_KEY_CLASS = "Class";
     final static String TAG_KEY_METHOD = "Method";
 
+    LinkedList<StackTraceElement> traceElements = null;
     private String loggingPrefix = "";
     protected ILog logger;
 
     // required when we search for the method call, use full name so we avoid big
     // problems caused by obfuscation
-    public final String fullClassName;
+    final String fullClassName;
 
 
     AbstractScopedLogger() {
         this.fullClassName = SmartLoggerUtils.getFullClassName(5);
     }
-
-//    final int parentsMatchClassName(int currentMatches, String className) {
-//        if (logger.getClass() == JeefoLogger.class) {
-//            return currentMatches;
-//        } else {
-//            return ((AbstractScopedLogger) logger).parentsMatchClassName((fullClassName.equals(className) ? 1 : 0) + currentMatches, className);
-//        }
-//    }
 
     final String getLoggingPrefix() {
         return loggingPrefix;
@@ -88,9 +82,13 @@ abstract class AbstractScopedLogger implements ILog{
         }
     }
 
-    synchronized void DebugReflection(String messageToLog, Object... args) {
+    synchronized void DebugReflection(final LinkedList<StackTraceElement> traceElements, String messageToLog, Object... args) {
+        this.traceElements = traceElements;
+
         try {
-            logger.getClass().getSuperclass().getDeclaredMethod("DebugReflection", String.class, Object[].class).invoke(logger, getMessageLogPrefix() + messageToLog, args);
+            logger.getClass().getSuperclass().getDeclaredMethod("DebugReflection",
+                    LinkedList.class, String.class, Object[].class)
+                    .invoke(logger, this.traceElements, getMessageLogPrefix() + messageToLog, args);
         } catch (IllegalAccessException e) {
             e.printStackTrace();
         } catch (InvocationTargetException e) {
@@ -100,9 +98,13 @@ abstract class AbstractScopedLogger implements ILog{
         }
     }
 
-    synchronized void DebugReflection(Exception exception, String messageToLog, Object... args) {
+    synchronized void DebugReflection(final LinkedList<StackTraceElement> traceElements, Exception exception, String messageToLog, Object... args) {
+        this.traceElements = traceElements;
+
         try {
-            logger.getClass().getSuperclass().getDeclaredMethod("DebugReflection", Exception.class, String.class, Object[].class).invoke(logger, exception, getMessageLogPrefix() + messageToLog, args);
+            logger.getClass().getSuperclass().getDeclaredMethod("DebugReflection",
+                    LinkedList.class, Exception.class, String.class, Object[].class)
+                    .invoke(logger, this.traceElements, exception, getMessageLogPrefix() + messageToLog, args);
         } catch (IllegalAccessException e) {
             e.printStackTrace();
         } catch (InvocationTargetException e) {
@@ -112,9 +114,13 @@ abstract class AbstractScopedLogger implements ILog{
         }
     }
 
-    synchronized void InfoReflection(String messageToLog, Object... args) {
+    synchronized void InfoReflection(final LinkedList<StackTraceElement> traceElements, String messageToLog, Object... args) {
+        this.traceElements = traceElements;
+
         try {
-            logger.getClass().getSuperclass().getDeclaredMethod("InfoReflection", String.class, Object[].class).invoke(logger, getMessageLogPrefix() + messageToLog, args);
+            logger.getClass().getSuperclass().getDeclaredMethod("InfoReflection",
+                    LinkedList.class, String.class, Object[].class)
+                    .invoke(logger, this.traceElements, getMessageLogPrefix() + messageToLog, args);
         } catch (IllegalAccessException e) {
             e.printStackTrace();
         } catch (InvocationTargetException e) {
@@ -124,9 +130,13 @@ abstract class AbstractScopedLogger implements ILog{
         }
     }
 
-    synchronized void WarnReflection(String messageToLog, Object... args) {
+    synchronized void WarnReflection(final LinkedList<StackTraceElement> traceElements, String messageToLog, Object... args) {
+        this.traceElements = traceElements;
+
         try {
-            logger.getClass().getSuperclass().getDeclaredMethod("WarnReflection", String.class, Object[].class).invoke(logger, getMessageLogPrefix() + messageToLog, args);
+            logger.getClass().getSuperclass().getDeclaredMethod("WarnReflection",
+                    LinkedList.class, String.class, Object[].class)
+                    .invoke(logger, this.traceElements, getMessageLogPrefix() + messageToLog, args);
         } catch (IllegalAccessException e) {
             e.printStackTrace();
         } catch (InvocationTargetException e) {
@@ -136,9 +146,13 @@ abstract class AbstractScopedLogger implements ILog{
         }
     }
 
-    synchronized void WarnReflection(Exception exception, String messageToLog, Object... args) {
+    synchronized void WarnReflection(final LinkedList<StackTraceElement> traceElements, Exception exception, String messageToLog, Object... args) {
+        this.traceElements = traceElements;
+
         try {
-            logger.getClass().getSuperclass().getDeclaredMethod("WarnReflection", Exception.class, String.class, Object[].class).invoke(logger, exception, getMessageLogPrefix() + messageToLog, args);
+            logger.getClass().getSuperclass().getDeclaredMethod("WarnReflection",
+                    LinkedList.class, Exception.class, String.class, Object[].class)
+                    .invoke(logger, this.traceElements, exception, getMessageLogPrefix() + messageToLog, args);
         } catch (IllegalAccessException e) {
             e.printStackTrace();
         } catch (InvocationTargetException e) {
@@ -148,9 +162,13 @@ abstract class AbstractScopedLogger implements ILog{
         }
     }
 
-    synchronized void ErrorReflection(String messageToLog, Object... args) {
+    synchronized void ErrorReflection(final LinkedList<StackTraceElement> traceElements, String messageToLog, Object... args) {
+        this.traceElements = traceElements;
+
         try {
-            logger.getClass().getSuperclass().getDeclaredMethod("ErrorReflection", String.class, Object[].class).invoke(logger, getMessageLogPrefix() + messageToLog, args);
+            logger.getClass().getSuperclass().getDeclaredMethod("ErrorReflection",
+                    LinkedList.class, String.class, Object[].class)
+                    .invoke(logger, this.traceElements, getMessageLogPrefix() + messageToLog, args);
         } catch (IllegalAccessException e) {
             e.printStackTrace();
         } catch (InvocationTargetException e) {
@@ -160,9 +178,13 @@ abstract class AbstractScopedLogger implements ILog{
         }
     }
 
-    synchronized void ErrorReflection(Exception exception, String messageToLog, Object... args) {
+    synchronized void ErrorReflection(final LinkedList<StackTraceElement> traceElements, Exception exception, String messageToLog, Object... args) {
+        this.traceElements = traceElements;
+
         try {
-            logger.getClass().getSuperclass().getDeclaredMethod("ErrorReflection", Exception.class, String.class, Object[].class).invoke(logger, exception, getMessageLogPrefix() + messageToLog, args);
+            logger.getClass().getSuperclass().getDeclaredMethod("ErrorReflection",
+                    LinkedList.class, Exception.class, String.class, Object[].class)
+                    .invoke(logger, this.traceElements, exception, getMessageLogPrefix() + messageToLog, args);
         } catch (IllegalAccessException e) {
             e.printStackTrace();
         } catch (InvocationTargetException e) {

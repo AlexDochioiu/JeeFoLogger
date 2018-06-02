@@ -19,6 +19,9 @@ package com.jeefo.android.jeefologger;
 
 import android.support.annotation.Nullable;
 
+import java.util.Arrays;
+import java.util.LinkedList;
+
 /**
  * Created by Alexandru Iustin Dochioiu on 5/27/2018
  */
@@ -46,7 +49,7 @@ public class SmartLogger extends AbstractScopedLogger {
 
     @Override
     String getMessageLogPrefix() {
-        final String methodName = SmartLoggerUtils.getMethodName(fullClassName, 1);
+        final String methodName = SmartLoggerUtils.getMethodName(fullClassName, traceElements);
 
         if (methodName != null) {
             return String.format("%s[%s %s] ", getLoggingPrefix(), TAG_KEY_METHOD, methodName);
@@ -64,7 +67,11 @@ public class SmartLogger extends AbstractScopedLogger {
      */
     @Override
     public synchronized void Debug(String messageToLog, Object... args) {
-        DebugReflection(messageToLog, args);
+        DebugReflection(
+                new LinkedList<>(Arrays.asList(Thread.currentThread().getStackTrace())),
+                messageToLog,
+                args
+        );
     }
 
     /**
@@ -76,7 +83,12 @@ public class SmartLogger extends AbstractScopedLogger {
      */
     @Override
     public synchronized void Debug(Exception exception, String messageToLog, Object... args) {
-        DebugReflection(exception, messageToLog, args);
+        DebugReflection(
+                new LinkedList<>(Arrays.asList(Thread.currentThread().getStackTrace())),
+                exception,
+                messageToLog,
+                args
+        );
     }
 
     /**
@@ -87,7 +99,11 @@ public class SmartLogger extends AbstractScopedLogger {
      */
     @Override
     public synchronized void Info(String messageToLog, Object... args) {
-        InfoReflection(messageToLog, args);
+        InfoReflection(
+                new LinkedList<>(Arrays.asList(Thread.currentThread().getStackTrace())),
+                messageToLog,
+                args
+        );
     }
 
     /**
@@ -98,7 +114,11 @@ public class SmartLogger extends AbstractScopedLogger {
      */
     @Override
     public synchronized void Warn(String messageToLog, Object... args) {
-        WarnReflection(messageToLog, args);
+        WarnReflection(
+                new LinkedList<>(Arrays.asList(Thread.currentThread().getStackTrace())),
+                messageToLog,
+                args
+        );
     }
 
     /**
@@ -110,7 +130,12 @@ public class SmartLogger extends AbstractScopedLogger {
      */
     @Override
     public synchronized void Warn(Exception exception, String messageToLog, Object... args) {
-        WarnReflection(exception, messageToLog, args);
+        WarnReflection(
+                new LinkedList<>(Arrays.asList(Thread.currentThread().getStackTrace())),
+                exception,
+                messageToLog,
+                args
+        );
     }
 
     /**
@@ -121,7 +146,11 @@ public class SmartLogger extends AbstractScopedLogger {
      */
     @Override
     public synchronized void Error(String messageToLog, Object... args) {
-        ErrorReflection(messageToLog, args);
+        ErrorReflection(
+                new LinkedList<>(Arrays.asList(Thread.currentThread().getStackTrace())),
+                messageToLog,
+                args
+        );
     }
 
     /**
@@ -133,7 +162,11 @@ public class SmartLogger extends AbstractScopedLogger {
      */
     @Override
     public synchronized void Error(Exception exception, String messageToLog, Object... args) {
-        ErrorReflection(exception, messageToLog, args);
+        ErrorReflection(new LinkedList<>(Arrays.asList(Thread.currentThread().getStackTrace())),
+                exception,
+                messageToLog,
+                args
+        );
     }
 
     /**
@@ -143,6 +176,10 @@ public class SmartLogger extends AbstractScopedLogger {
      */
     @Override
     public synchronized void Error(Exception exception) {
-        ErrorReflection(exception, "");
+        ErrorReflection(
+                new LinkedList<>(Arrays.asList(Thread.currentThread().getStackTrace())),
+                exception,
+                ""
+        );
     }
 }

@@ -13,10 +13,10 @@ public class SimpleUtils {
 
     public static void printMeALog(ILog log) {
         ILog logger = new SmartLogger(log);
-        logger.Info("Hard to believe it will work");
+        //logger.Debug("Hard to believe it will work");
 
         printMeSecondLog(log);
-        logger.Info("Stuff");
+        //logger.Debug("Stuff");
         printMeSecondLog(logger);
     }
 
@@ -25,8 +25,8 @@ public class SimpleUtils {
 
         logger.Debug("hmm");
 
-        lazyLogger.Warn("Is this fine? %s", "is it?");
-        final ILog scopedLog = new ScopedLogger(lazyLogger, String.class, true);
-        scopedLog.Error("Whatever");
+        //lazyLogger.Warn("Is this fine? %s", "is it?");
+        //final ILog scopedLog = new ScopedLogger(lazyLogger, String.class, true);
+        //scopedLog.Error("Whatever");
     }
 }

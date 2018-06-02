@@ -19,27 +19,29 @@ package com.jeefo.android.jeefologger;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import java.util.LinkedList;
+
 
 /**
  * Created by Alexandru Iustin Dochioiu on 13/12/17.
- *
+ * <p>
  * Concurrent logger used for creating a pass-through trace which will improve drastically the readability of
  * the logged messages as well as decrease the debugging time when bugs/ crashes arise. For ease of
  * use, the messages contain placeholders ('%s') and String params which will replace them.
- *
+ * <p>
  * It logs all the messages to Logcat as well as to a persistent file (if activated).
  */
-@SuppressWarnings("WeakerAccess")
+@SuppressWarnings({"WeakerAccess", "RedundantCast", "unchecked"})
 public class ScopedLogger extends AbstractScopedLogger {
 
     /**
      * Constructor used for initializing a completely new {@link ScopedLogger} which will (ideally)
      * be used in creating further {@link ScopedLogger}s with extended trace.
-     *
+     * <p>
      * NOTE: This constructor adds the instance tag. if this is undesired, use the following constructor:
-     *  ScopedLogger(@NonNull Class classCaller, boolean addInstanceUidTag) and set the second param to false
+     * ScopedLogger(@NonNull Class classCaller, boolean addInstanceUidTag) and set the second param to false
      *
-     * @param classCaller       the {@link Class} in which this log is created
+     * @param classCaller the {@link Class} in which this log is created
      */
     public ScopedLogger(@NonNull Class classCaller) {
         this(classCaller, true);
@@ -139,7 +141,7 @@ public class ScopedLogger extends AbstractScopedLogger {
      */
     @Override
     public synchronized void Debug(String messageToLog, Object... args) {
-        DebugReflection(" " + messageToLog, args);
+        DebugReflection((LinkedList) null, " " + messageToLog, args);
     }
 
     /**
@@ -151,7 +153,7 @@ public class ScopedLogger extends AbstractScopedLogger {
      */
     @Override
     public synchronized void Debug(Exception exception, String messageToLog, Object... args) {
-        DebugReflection(exception, " " + messageToLog, args);
+        DebugReflection((LinkedList) null, exception, " " + messageToLog, args);
     }
 
     /**
@@ -162,7 +164,7 @@ public class ScopedLogger extends AbstractScopedLogger {
      */
     @Override
     public synchronized void Info(String messageToLog, Object... args) {
-        InfoReflection(" " + messageToLog, args);
+        InfoReflection((LinkedList) null, " " + messageToLog, args);
     }
 
     /**
@@ -173,7 +175,7 @@ public class ScopedLogger extends AbstractScopedLogger {
      */
     @Override
     public synchronized void Warn(String messageToLog, Object... args) {
-        WarnReflection(" " + messageToLog, args);
+        WarnReflection((LinkedList) null, " " + messageToLog, args);
     }
 
     /**
@@ -185,7 +187,7 @@ public class ScopedLogger extends AbstractScopedLogger {
      */
     @Override
     public synchronized void Warn(Exception exception, String messageToLog, Object... args) {
-        WarnReflection(exception, " " + messageToLog, args);
+        WarnReflection((LinkedList) null, exception, " " + messageToLog, args);
     }
 
     /**
@@ -196,7 +198,7 @@ public class ScopedLogger extends AbstractScopedLogger {
      */
     @Override
     public synchronized void Error(String messageToLog, Object... args) {
-        ErrorReflection(" " + messageToLog, args);
+        ErrorReflection((LinkedList) null, " " + messageToLog, args);
     }
 
     /**
@@ -208,7 +210,7 @@ public class ScopedLogger extends AbstractScopedLogger {
      */
     @Override
     public synchronized void Error(Exception exception, String messageToLog, Object... args) {
-        ErrorReflection(exception, " " + messageToLog, args);
+        ErrorReflection((LinkedList) null, exception, " " + messageToLog, args);
     }
 
     /**
@@ -218,7 +220,7 @@ public class ScopedLogger extends AbstractScopedLogger {
      */
     @Override
     public synchronized void Error(Exception exception) {
-        ErrorReflection(exception, "");
+        ErrorReflection((LinkedList) null, exception, "");
     }
 
     @Override

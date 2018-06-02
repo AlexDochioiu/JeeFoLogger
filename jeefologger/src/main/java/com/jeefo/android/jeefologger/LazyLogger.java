@@ -18,6 +18,7 @@ package com.jeefo.android.jeefologger;
 
 import android.util.Pair;
 
+import java.util.LinkedList;
 import java.util.List;
 
 import static com.jeefo.android.jeefologger.SmartLoggerUtils.getAllTraceForPackage;
@@ -25,6 +26,7 @@ import static com.jeefo.android.jeefologger.SmartLoggerUtils.getAllTraceForPacka
 /**
  * Created by Alexandru Iustin Dochioiu on 6/2/2018
  */
+@SuppressWarnings("unchecked")
 public class LazyLogger extends AbstractScopedLogger {
 
     /**
@@ -47,7 +49,7 @@ public class LazyLogger extends AbstractScopedLogger {
 
         List<Pair<String, List<String>>> traces = SmartLoggerUtils.getAllTraceForPackage(JeefoLogger.packageName);
 
-        for (int index = traces.size() - 1 ; index >= 0 ; --index) {
+        for (int index = traces.size() - 1; index >= 0; --index) {
             final Pair<String, List<String>> trace = traces.get(index);
             logPrefix.append("[").append(TAG_KEY_CLASS).append(" ").append(trace.first).append("]");
             for (int methodIndex = trace.second.size() - 1; methodIndex >= 0; --methodIndex) {
@@ -66,7 +68,7 @@ public class LazyLogger extends AbstractScopedLogger {
      */
     @Override
     public void Debug(String messageToLog, Object... args) {
-        DebugReflection(messageToLog, args);
+        DebugReflection((LinkedList) null, messageToLog, args);
     }
 
     /**
@@ -77,7 +79,7 @@ public class LazyLogger extends AbstractScopedLogger {
      */
     @Override
     public void Debug(Exception exception, String messageToLog, Object... args) {
-        DebugReflection(exception, messageToLog, args);
+        DebugReflection((LinkedList) null, exception, messageToLog, args);
     }
 
     /**
@@ -87,7 +89,7 @@ public class LazyLogger extends AbstractScopedLogger {
      */
     @Override
     public void Info(String messageToLog, Object... args) {
-        InfoReflection(messageToLog, args);
+        InfoReflection((LinkedList) null, messageToLog, args);
     }
 
     /**
@@ -97,7 +99,7 @@ public class LazyLogger extends AbstractScopedLogger {
      */
     @Override
     public void Warn(String messageToLog, Object... args) {
-        WarnReflection(messageToLog, args);
+        WarnReflection((LinkedList) null, messageToLog, args);
     }
 
     /**
@@ -108,7 +110,7 @@ public class LazyLogger extends AbstractScopedLogger {
      */
     @Override
     public void Warn(Exception exception, String messageToLog, Object... args) {
-        WarnReflection(exception, messageToLog, args);
+        WarnReflection((LinkedList) null, exception, messageToLog, args);
     }
 
     /**
@@ -118,7 +120,7 @@ public class LazyLogger extends AbstractScopedLogger {
      */
     @Override
     public void Error(String messageToLog, Object... args) {
-        ErrorReflection(messageToLog, args);
+        ErrorReflection((LinkedList) null, messageToLog, args);
     }
 
     /**
@@ -129,7 +131,7 @@ public class LazyLogger extends AbstractScopedLogger {
      */
     @Override
     public void Error(Exception exception, String messageToLog, Object... args) {
-        ErrorReflection(exception, messageToLog, args);
+        ErrorReflection((LinkedList) null, exception, messageToLog, args);
     }
 
     /**
@@ -138,6 +140,6 @@ public class LazyLogger extends AbstractScopedLogger {
      */
     @Override
     public void Error(Exception exception) {
-        ErrorReflection(exception, "");
+        ErrorReflection((LinkedList) null, exception, "");
     }
 }

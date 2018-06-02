@@ -20,7 +20,6 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Pair;
 
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -49,18 +48,23 @@ class SmartLoggerUtils {
     }
 
     @Nullable
-    static String getMethodName(String className, int depth) {
-        final StackTraceElement[] ste = Thread.currentThread().getStackTrace();
-
-        for (StackTraceElement traceElement : ste) {
-            if (traceElement.getClassName().matches(className)) {
-                if (--depth == 0) {
-                    return traceElement.getMethodName();
-                }
-            }
+    static String getMethodName(String className, @Nullable LinkedList<StackTraceElement> elements) {
+        if (elements == null) {
+            return null;
         }
 
-        return null;
+        String methodName = null;
+
+        while (elements.size() > 0) {
+            if (elements.getFirst().getClassName().matches(className)) {
+                methodName = elements.getFirst().getMethodName();
+                elements.removeFirst();
+                break;
+            }
+            elements.removeFirst();
+        }
+
+        return methodName;
     }
 
     static String getFullClassName(int depth) {
@@ -72,12 +76,12 @@ class SmartLoggerUtils {
     static List<Pair<String, List<String>>> getAllTraceForPackage(String packageName) {
         final StackTraceElement[] ste = Thread.currentThread().getStackTrace();
         final List<Pair<String, List<String>>> packageCalls = new LinkedList<>();
-        for (int index = 0; index < ste.length; ++index) {
-            if (ste[index].getClassName().contains(packageName)) {
-                final StackTraceElement element = ste[index];
+
+        for (StackTraceElement traceElement : ste) {
+            if (traceElement.getClassName().contains(packageName)) {
                 //todo: use the full class name with package to compare if one class is the same or not
-                final String className = getClassNameFromFileName(element.getFileName());
-                final String methodName = element.getMethodName();
+                final String className = getClassNameFromFileName(traceElement.getFileName());
+                final String methodName = traceElement.getMethodName();
 
                 if (packageCalls.size() > 0) {
                     if (className.equals(packageCalls.get(packageCalls.size() - 1).first)) {
@@ -88,7 +92,7 @@ class SmartLoggerUtils {
                 }
 
                 final List<String> methodCalls = new LinkedList<>();
-                methodCalls.add(element.getMethodName());
+                methodCalls.add(traceElement.getMethodName());
 
                 packageCalls.add(new Pair<>(className, methodCalls));
             }
