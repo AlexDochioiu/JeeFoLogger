@@ -32,8 +32,6 @@ import android.support.annotation.Nullable;
 @SuppressWarnings("WeakerAccess")
 public class ScopedLogger extends AbstractScopedLogger {
 
-    static final int DEPTH_PER_INSTANCE = 3;
-
     /**
      * Constructor used for initializing a completely new {@link ScopedLogger} which will (ideally)
      * be used in creating further {@link ScopedLogger}s with extended trace.
@@ -141,7 +139,7 @@ public class ScopedLogger extends AbstractScopedLogger {
      */
     @Override
     public synchronized void Debug(String messageToLog, Object... args) {
-        DebugReflection(messageToLog, args);
+        DebugReflection(" " + messageToLog, args);
     }
 
     /**
@@ -153,7 +151,7 @@ public class ScopedLogger extends AbstractScopedLogger {
      */
     @Override
     public synchronized void Debug(Exception exception, String messageToLog, Object... args) {
-        DebugReflection(exception, messageToLog, args);
+        DebugReflection(exception, " " + messageToLog, args);
     }
 
     /**
@@ -164,7 +162,7 @@ public class ScopedLogger extends AbstractScopedLogger {
      */
     @Override
     public synchronized void Info(String messageToLog, Object... args) {
-        InfoReflection(messageToLog, args);
+        InfoReflection(" " + messageToLog, args);
     }
 
     /**
@@ -175,7 +173,7 @@ public class ScopedLogger extends AbstractScopedLogger {
      */
     @Override
     public synchronized void Warn(String messageToLog, Object... args) {
-        WarnReflection(messageToLog, args);
+        WarnReflection(" " + messageToLog, args);
     }
 
     /**
@@ -187,7 +185,7 @@ public class ScopedLogger extends AbstractScopedLogger {
      */
     @Override
     public synchronized void Warn(Exception exception, String messageToLog, Object... args) {
-        WarnReflection(exception, messageToLog, args);
+        WarnReflection(exception, " " + messageToLog, args);
     }
 
     /**
@@ -198,7 +196,7 @@ public class ScopedLogger extends AbstractScopedLogger {
      */
     @Override
     public synchronized void Error(String messageToLog, Object... args) {
-        ErrorReflection(messageToLog, args);
+        ErrorReflection(" " + messageToLog, args);
     }
 
     /**
@@ -210,7 +208,7 @@ public class ScopedLogger extends AbstractScopedLogger {
      */
     @Override
     public synchronized void Error(Exception exception, String messageToLog, Object... args) {
-        ErrorReflection(exception, messageToLog, args);
+        ErrorReflection(exception, " " + messageToLog, args);
     }
 
     /**

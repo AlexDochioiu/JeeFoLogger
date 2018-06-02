@@ -29,24 +29,35 @@ import static com.jeefo.android.jeefologger.StringUtils.getFormattedMessage;
 @SuppressWarnings("WeakerAccess")
 public class JeefoLogger implements ILog {
 
-    public static final int TAG_ID_NOT_FOUND = PersistentTagsManager.TAG_ID_NOT_FOUND;
-    public static final int TAG_ID_IS_NULL = PersistentTagsManager.TAG_ID_IS_NULL;
-    public static final int TAG_REMOVED = PersistentTagsManager.TAG_REMOVED;
+    static final int TAG_ID_NOT_FOUND = PersistentTagsManager.TAG_ID_NOT_FOUND;
+    static final int TAG_ID_IS_NULL = PersistentTagsManager.TAG_ID_IS_NULL;
+    static final int TAG_REMOVED = PersistentTagsManager.TAG_REMOVED;
 
     private static final ILog persistentLogger = new PersistentLogger();
-    public static final String loggingPrefix = "[JeeFo-Log]";
+
+    static final String loggingPrefix = "[JeeFo-Log]";
+    static String packageName = null;
 
     /**
      * Public method used for initializing persistence. If persistence is not desired, do not
      * call this method.
      *
-     * @param context the Application Context.
+     * @param context any kind of context.
      * @throws IllegalArgumentException if the context is null and the persistence has not
      *                                  already been initialized
      */
     public static void initPersistence(@NonNull Context context) {
         PersistentLogger.init(context);
+        initDebugLogger(context);
     }
+
+    /**
+     * Public method used for initializing the debug logger. This does not need to be called
+     * if the {@link JeefoLogger#initPersistence(Context)} is called
+     *
+     * @param context any kind of context
+     */
+    public static void initDebugLogger(@NonNull Context context) { packageName = context.getPackageName(); }
 
     @Override
     public void Debug(String messageToLog, Object... args) {

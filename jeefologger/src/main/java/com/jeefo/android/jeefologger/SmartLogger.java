@@ -28,7 +28,7 @@ public class SmartLogger extends AbstractScopedLogger {
         super();
         initLogger(null);
 
-        final String classCaller = SmartLoggerUtils.getClassName();
+        final String classCaller = SmartLoggerUtils.getSimpleClassName(4);
 
         addTag(TAG_KEY_CLASS, classCaller, false);
         addTag(TAG_KEY_INSTANCE, UuidCustomUtils.generateShortUUID(), true);
@@ -38,7 +38,7 @@ public class SmartLogger extends AbstractScopedLogger {
         super();
         initLogger(logger);
 
-        final String classCaller = SmartLoggerUtils.getClassName();
+        final String classCaller = SmartLoggerUtils.getSimpleClassName(4);
 
         addTag(TAG_KEY_CLASS, classCaller, false);
         addTag(TAG_KEY_INSTANCE, UuidCustomUtils.generateShortUUID(), true);
@@ -46,7 +46,13 @@ public class SmartLogger extends AbstractScopedLogger {
 
     @Override
     String getMessageLogPrefix() {
-        return String.format("%s[%s %s] ", getLoggingPrefix(), TAG_KEY_METHOD, SmartLoggerUtils.getMethodName(fullClassName, 1));
+        final String methodName = SmartLoggerUtils.getMethodName(fullClassName, 1);
+
+        if (methodName != null) {
+            return String.format("%s[%s %s] ", getLoggingPrefix(), TAG_KEY_METHOD, methodName);
+        } else {
+            return getLoggingPrefix();
+        }
     }
 
 

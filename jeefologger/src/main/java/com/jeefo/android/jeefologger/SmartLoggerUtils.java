@@ -16,34 +16,40 @@
 
 package com.jeefo.android.jeefologger;
 
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.util.Pair;
+
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+
 /**
  * Created by Alexandru Iustin Dochioiu on 5/27/2018
  */
 class SmartLoggerUtils {
 
-    static String getClassName() {
+    @NonNull
+    static String getSimpleClassName(int depth) {
         final StackTraceElement[] ste = Thread.currentThread().getStackTrace();
 
-        final String fileName = ste[4].getFileName();
-        return fileName.substring(0, fileName.indexOf('.'));
+        return getClassNameFromFileName(ste[depth].getFileName());
     }
 
     /**
      * Get the method name for a depth in call stack. <br />
      * Utility function
+     *
      * @return method name
      */
-    static String getMethodName(int depth)
-    {
+    static String getMethodName(int depth) {
         final StackTraceElement[] ste = Thread.currentThread().getStackTrace();
 
-        //System. out.println(ste[ste.length-depth].getClassName()+"#"+ste[ste.length-depth].getMethodName());
-        // return ste[ste.length - depth].getMethodName();  //Wrong, fails for depth = 0
-        return ste[depth].getMethodName(); //Thank you Tom Tresansky
+        return ste[depth].getMethodName();
     }
 
-    static String getMethodName(String className, int depth)
-    {
+    @Nullable
+    static String getMethodName(String className, int depth) {
         final StackTraceElement[] ste = Thread.currentThread().getStackTrace();
 
         for (StackTraceElement traceElement : ste) {
@@ -54,12 +60,45 @@ class SmartLoggerUtils {
             }
         }
 
-        return "";
+        return null;
     }
 
-    public static String getFullClassName() {
+    static String getFullClassName(int depth) {
         final StackTraceElement[] ste = Thread.currentThread().getStackTrace();
 
-        return ste[5].getClassName();
+        return ste[depth].getClassName();
+    }
+
+    static List<Pair<String, List<String>>> getAllTraceForPackage(String packageName) {
+        final StackTraceElement[] ste = Thread.currentThread().getStackTrace();
+        final List<Pair<String, List<String>>> packageCalls = new LinkedList<>();
+        for (int index = 0; index < ste.length; ++index) {
+            if (ste[index].getClassName().contains(packageName)) {
+                final StackTraceElement element = ste[index];
+                //todo: use the full class name with package to compare if one class is the same or not
+                final String className = getClassNameFromFileName(element.getFileName());
+                final String methodName = element.getMethodName();
+
+                if (packageCalls.size() > 0) {
+                    if (className.equals(packageCalls.get(packageCalls.size() - 1).first)) {
+                        // add a second method to the same class then continue
+                        packageCalls.get(packageCalls.size() - 1).second.add(methodName);
+                        continue;
+                    }
+                }
+
+                final List<String> methodCalls = new LinkedList<>();
+                methodCalls.add(element.getMethodName());
+
+                packageCalls.add(new Pair<>(className, methodCalls));
+            }
+        }
+
+        return packageCalls;
+    }
+
+    @NonNull
+    private static String getClassNameFromFileName(@NonNull String fileName) {
+        return fileName.substring(0, fileName.indexOf('.'));
     }
 }
