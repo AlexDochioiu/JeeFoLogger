@@ -20,6 +20,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
 import com.jeefo.android.jeefologger.ILog;
+import com.jeefo.android.jeefologger.JeefoLogger;
 import com.jeefo.android.jeefologger.SmartLogger;
 import com.jeefo.android.logger.utils.SimpleUtils;
 
@@ -31,6 +32,8 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        JeefoLogger.initDebugLogger(this);
 
         SimpleClassWithPassedLog classOne = new SimpleClassWithPassedLog(logger);
         classOne.tellMeSomethingNasty();

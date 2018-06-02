@@ -41,7 +41,7 @@ class PersistentLogger implements ILog {
     private static final Object lockObject = new Object();
 
     /**
-     * @param context the Application Context.
+     * @param context any kind of context.
      * @throws IllegalArgumentException if the context is null
      */
     public static void init(@NonNull final Context context) {

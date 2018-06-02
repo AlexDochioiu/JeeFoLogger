@@ -38,7 +38,7 @@ abstract class AbstractScopedLogger implements ILog{
 
 
     AbstractScopedLogger() {
-        this.fullClassName = SmartLoggerUtils.getFullClassName();
+        this.fullClassName = SmartLoggerUtils.getFullClassName(5);
     }
 
 //    final int parentsMatchClassName(int currentMatches, String className) {
