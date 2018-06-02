@@ -29,9 +29,9 @@ import static com.jeefo.android.jeefologger.StringUtils.getFormattedMessage;
 @SuppressWarnings("WeakerAccess")
 public class JeefoLogger implements ILog {
 
-    static final int TAG_ID_NOT_FOUND = PersistentTagsManager.TAG_ID_NOT_FOUND;
-    static final int TAG_ID_IS_NULL = PersistentTagsManager.TAG_ID_IS_NULL;
-    static final int TAG_REMOVED = PersistentTagsManager.TAG_REMOVED;
+    public static final int TAG_ID_NOT_FOUND = PersistentTagsManager.TAG_ID_NOT_FOUND;
+    public static final int TAG_ID_IS_NULL = PersistentTagsManager.TAG_ID_IS_NULL;
+    public static final int TAG_REMOVED = PersistentTagsManager.TAG_REMOVED;
 
     private static final ILog persistentLogger = new PersistentLogger();
 
