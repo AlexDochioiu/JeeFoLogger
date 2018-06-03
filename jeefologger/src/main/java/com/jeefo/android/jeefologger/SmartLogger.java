@@ -31,7 +31,7 @@ class SmartLogger extends AbstractScopedLogger {
     // problems caused by obfuscation
     private final String fullClientClassName;
 
-    SmartLogger() {
+    SmartLogger(boolean addInstanceTag) {
         initLogger(null);
 
         String clientClassCaller;
@@ -40,10 +40,13 @@ class SmartLogger extends AbstractScopedLogger {
         clientClassCaller = SmartLoggerUtils.getSimpleClassName(5);
 
         addTag(TAG_KEY_CLASS, clientClassCaller, false);
-        addTag(TAG_KEY_INSTANCE, UuidCustomUtils.generateShortUUID(), true);
+
+        if (addInstanceTag) {
+            addTag(TAG_KEY_INSTANCE, UuidCustomUtils.generateShortUUID(), true);
+        }
     }
 
-    SmartLogger(@Nullable ILog logger) {
+    SmartLogger(@Nullable ILog logger, boolean addInstanceTag) {
         initLogger(logger);
 
         //todo: check if logger class is the same as the top one. if that's the case, we should not add extra tags here
@@ -54,7 +57,9 @@ class SmartLogger extends AbstractScopedLogger {
         clientClassCaller = SmartLoggerUtils.getSimpleClassName(5);
 
         addTag(TAG_KEY_CLASS, clientClassCaller, false);
-        addTag(TAG_KEY_INSTANCE, UuidCustomUtils.generateShortUUID(), true);
+        if (addInstanceTag) {
+            addTag(TAG_KEY_INSTANCE, UuidCustomUtils.generateShortUUID(), true);
+        }
     }
 
     String getFullClientClassName() {
