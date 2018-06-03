@@ -25,37 +25,55 @@ import java.util.LinkedList;
 /**
  * Created by Alexandru Iustin Dochioiu on 5/27/2018
  */
-public class SmartLogger extends AbstractScopedLogger {
+class SmartLogger extends AbstractScopedLogger {
 
-    public SmartLogger() {
-        super();
+    // required when we search for the method call, use full name so we avoid big
+    // problems caused by obfuscation
+    private final String fullClientClassName;
+
+    SmartLogger() {
         initLogger(null);
 
-        final String classCaller = SmartLoggerUtils.getSimpleClassName(4);
+        String clientClassCaller;
 
-        addTag(TAG_KEY_CLASS, classCaller, false);
+        fullClientClassName = SmartLoggerUtils.getFullClassName(5);
+        clientClassCaller = SmartLoggerUtils.getSimpleClassName(5);
+
+        addTag(TAG_KEY_CLASS, clientClassCaller, false);
         addTag(TAG_KEY_INSTANCE, UuidCustomUtils.generateShortUUID(), true);
     }
 
-    public SmartLogger(@Nullable ILog logger) {
-        super();
+    SmartLogger(@Nullable ILog logger) {
         initLogger(logger);
 
-        final String classCaller = SmartLoggerUtils.getSimpleClassName(4);
+        //todo: check if logger class is the same as the top one. if that's the case, we should not add extra tags here
 
-        addTag(TAG_KEY_CLASS, classCaller, false);
+        String clientClassCaller;
+
+        fullClientClassName = SmartLoggerUtils.getFullClassName(5);
+        clientClassCaller = SmartLoggerUtils.getSimpleClassName(5);
+
+        addTag(TAG_KEY_CLASS, clientClassCaller, false);
         addTag(TAG_KEY_INSTANCE, UuidCustomUtils.generateShortUUID(), true);
+    }
+
+    String getFullClientClassName() {
+        return fullClientClassName;
     }
 
     @Override
     String getMessageLogPrefix() {
-        final String methodName = SmartLoggerUtils.getMethodName(fullClassName, traceElements);
+
+        final String methodName = SmartLoggerUtils.getMethodName(fullClientClassName, traceElements);
+        StringBuilder messageLogPrefix = new StringBuilder();
+        messageLogPrefix.append(getLoggingPrefix());
 
         if (methodName != null) {
-            return String.format("%s[%s %s] ", getLoggingPrefix(), TAG_KEY_METHOD, methodName);
-        } else {
-            return getLoggingPrefix();
+            messageLogPrefix.append("[").append(TAG_KEY_METHOD).append(" ").append(methodName).append("]");
         }
+
+        messageLogPrefix.append(" ");
+        return messageLogPrefix.toString();
     }
 
 

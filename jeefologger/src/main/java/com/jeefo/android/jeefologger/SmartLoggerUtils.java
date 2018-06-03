@@ -22,6 +22,7 @@ import android.util.Pair;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * Created by Alexandru Iustin Dochioiu on 5/27/2018
@@ -35,18 +36,6 @@ class SmartLoggerUtils {
         return getClassNameFromFileName(ste[depth].getFileName());
     }
 
-    /**
-     * Get the method name for a depth in call stack. <br />
-     * Utility function
-     *
-     * @return method name
-     */
-    static String getMethodName(int depth) {
-        final StackTraceElement[] ste = Thread.currentThread().getStackTrace();
-
-        return ste[depth].getMethodName();
-    }
-
     @Nullable
     static String getMethodName(String className, @Nullable LinkedList<StackTraceElement> elements) {
         if (elements == null) {
@@ -56,9 +45,22 @@ class SmartLoggerUtils {
         String methodName = null;
 
         while (elements.size() > 0) {
-            if (elements.getFirst().getClassName().matches(className)) {
+            String elementClassName = elements.getFirst().getClassName();
+            String anonymousHostClassName = null;
+
+            if (elementClassName.contains("$")) {
+                // that generally means it's an anonymous class such as runnable
+                anonymousHostClassName = elementClassName.substring(0, elementClassName.indexOf('$'));
+            }
+
+            if (className.compareTo(elementClassName) == 0 || ( anonymousHostClassName != null && className.compareTo(anonymousHostClassName) == 0 )) {
                 methodName = elements.getFirst().getMethodName();
                 elements.removeFirst();
+
+                if (anonymousHostClassName != null) {
+                    methodName = String.format(Locale.UK, "%s <- %s#%s(args)", methodName, getClassNameFromFileName(elements.getFirst().getFileName()), elements.getFirst().getMethodName());
+                    elements.removeFirst();
+                }
                 break;
             }
             elements.removeFirst();
@@ -104,5 +106,9 @@ class SmartLoggerUtils {
     @NonNull
     private static String getClassNameFromFileName(@NonNull String fileName) {
         return fileName.substring(0, fileName.indexOf('.'));
+    }
+
+    public static boolean checkRunnable(int depth) {
+        return Thread.currentThread().getStackTrace()[depth].getClassName().contains("$");
     }
 }

@@ -25,23 +25,15 @@ import java.util.Locale;
 /**
  * Created by Alexandru Iustin Dochioiu on 5/27/2018
  */
-abstract class AbstractScopedLogger implements ILog{
+abstract class AbstractScopedLogger implements ILog {
     final static String TAG_KEY_INSTANCE = "Instance";
     final static String TAG_KEY_CLASS = "Class";
     final static String TAG_KEY_METHOD = "Method";
 
     LinkedList<StackTraceElement> traceElements = null;
+
     private String loggingPrefix = "";
     protected ILog logger;
-
-    // required when we search for the method call, use full name so we avoid big
-    // problems caused by obfuscation
-    final String fullClassName;
-
-
-    AbstractScopedLogger() {
-        this.fullClassName = SmartLoggerUtils.getFullClassName(5);
-    }
 
     final String getLoggingPrefix() {
         return loggingPrefix;

@@ -21,14 +21,14 @@ import android.os.Bundle;
 
 import com.jeefo.android.jeefologger.ILog;
 import com.jeefo.android.jeefologger.JeefoLogger;
+import com.jeefo.android.jeefologger.LazyLogger;
 import com.jeefo.android.jeefologger.ScopedLogger;
-import com.jeefo.android.jeefologger.SmartLogger;
+import com.jeefo.android.jeefologger.SmartLoggerFactory;
 import com.jeefo.android.logger.utils.RunnableUtils;
-import com.jeefo.android.logger.utils.SimpleUtils;
 
 
 public class MainActivity extends AppCompatActivity {
-    private ILog logger = new SmartLogger();
+    private ILog logger = SmartLoggerFactory.createSmartLogger();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,60 +38,64 @@ public class MainActivity extends AppCompatActivity {
         JeefoLogger.initDebugLogger(this);
 
         SimpleClassWithPassedLog classOne = new SimpleClassWithPassedLog(logger);
-        classOne.tellMeSomethingNasty();
+        //classOne.tellMeSomethingNasty();
 
         SimpleClassWithInstantiatedLog classTwo = new SimpleClassWithInstantiatedLog();
-        classTwo.tellMeSomethingNice();
+        //classTwo.tellMeSomethingNice();
 
-        SimpleUtils.printMeALog(logger);
+        //SimpleUtils.printMeALog(logger);
 
-        logger.Debug("This is a debug message");
-        logger.Info("Info message with param: %s", "param");
-        logger.Warn("Warn message");
+//        logger.Debug("This is a debug message");
+//        logger.Info("Info message with param: %s", "param");
+//        logger.Warn("Warn message");
 
-        ILog newSmartLogger = new SmartLogger(logger);
-        newSmartLogger.Info("Now we're fucked");
+        ILog newSmartLogger = SmartLoggerFactory.createSmartLogger(logger);
+//        newSmartLogger.Info("Now we're fucked");
 
         JeefoLogger.initPersistence(this);
 
-        logger.Error(new IllegalArgumentException("ArgExc"));
-        logger.Warn(new IllegalStateException("exc"), "Exception added: %s", "IllegalStateExc");
+//        logger.Error(new IllegalArgumentException("ArgExc"));
+//        logger.Warn(new IllegalStateException("exc"), "Exception added: %s", "IllegalStateExc");
 
         ILog newLog = new ScopedLogger(logger, String.class, true);
-        newLog.Info("Added second class to trace");
+//        newLog.Info("Added second class to trace");
 
         //JeefoLogger.addPersistentTag("USER", "username");
 
         ILog secondNewLog = new ScopedLogger(newLog, InternalError.class, false);
-        secondNewLog.Debug("Added another logger with no instance");
-        secondNewLog.Error("Encountered %d errors while doing %s for %.2f seconds", 0, "nothing", 3.237f);
+//        secondNewLog.Debug("Added another logger with no instance");
+//        secondNewLog.Error("Encountered %d errors while doing %s for %.2f seconds", 0, "nothing", 3.237f);
         //String loggedTagUid = JeefoLogger.addPersistentTag("LOGGED", "FACEBOOK");
         //JeefoLogger.addPersistentTag("LOGGED", "SAME_KEY");
-        secondNewLog.Info("Message with fucked up placeholders: %s");
-        secondNewLog.Warn("Message with fucked up placeholders again: %d", "StringArgInsteadOfInt");
+//        secondNewLog.Info("Message with fucked up placeholders: %s");
+//        secondNewLog.Warn("Message with fucked up placeholders again: %d", "StringArgInsteadOfInt");
         //JeefoLogger.removeAllPersistentTagsFromKey("LOGGED");
-        secondNewLog.Error("Message with more placeholders than args %s %s", "onlyArg");
+//        secondNewLog.Error("Message with more placeholders than args %s %s", "onlyArg");
 
-        logger.Warn("Screwed up depth??");
+//        logger.Warn("Screwed up depth??");
 
 
         //acceptable message as the string.format works
-        secondNewLog.Info("Message with placeholders which will not be displayed. %s", "whatever", 2, 3.2, logger);
+//        secondNewLog.Info("Message with placeholders which will not be displayed. %s", "whatever", 2, 3.2, logger);
 
         Runnable runnable = new Runnable() {
             @Override
             public void run() {
                 logger.Debug("Inside the runnable");
-                ILog rLogger = new SmartLogger(logger);
+                ILog rLogger = SmartLoggerFactory.createSmartLogger(logger);
                 rLogger.Error("rLogger MainActivity");
+                ILog ll = new LazyLogger();
+                ll.Info("test");
             }
         };
         Runnable outerRunnable = new Runnable() {
             @Override
             public void run() {
                 logger.Debug("runnable ran inside utils class");
-                ILog rLogger = new SmartLogger(logger);
+                ILog rLogger = SmartLoggerFactory.createSmartLogger(logger);
                 rLogger.Error("rLogger Utils");
+                ILog ll = new LazyLogger();
+                ll.Info("test");
             }
         };
 

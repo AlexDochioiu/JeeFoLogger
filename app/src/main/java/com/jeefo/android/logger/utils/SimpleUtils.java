@@ -2,8 +2,7 @@ package com.jeefo.android.logger.utils;
 
 import com.jeefo.android.jeefologger.ILog;
 import com.jeefo.android.jeefologger.LazyLogger;
-import com.jeefo.android.jeefologger.ScopedLogger;
-import com.jeefo.android.jeefologger.SmartLogger;
+import com.jeefo.android.jeefologger.SmartLoggerFactory;
 
 /**
  * Created by Alexandru Iustin Dochioiu on 5/27/2018
@@ -12,7 +11,7 @@ public class SimpleUtils {
     private static ILog lazyLogger = new LazyLogger();
 
     public static void printMeALog(ILog log) {
-        ILog logger = new SmartLogger(log);
+        ILog logger = SmartLoggerFactory.createSmartLogger(log);
         //logger.Debug("Hard to believe it will work");
 
         printMeSecondLog(log);
@@ -21,7 +20,7 @@ public class SimpleUtils {
     }
 
     private static void printMeSecondLog(ILog log) {
-        ILog logger = new SmartLogger(log);
+        ILog logger = SmartLoggerFactory.createSmartLogger(log);
 
         logger.Debug("hmm");
 
