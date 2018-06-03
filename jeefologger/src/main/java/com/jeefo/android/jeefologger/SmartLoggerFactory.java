@@ -61,6 +61,10 @@ public class SmartLoggerFactory {
         return new SmartLogger(addInstanceTag);
     }
 
+    /**
+     * @param logger the {@link ILog} on top of which the new tags will be added
+     * @return the {@link SmartLogger} extended with new tags (and no instance tag added)
+     */
     @NonNull
     public static SmartLogger createSmartLogger(@Nullable ILog logger) {
         if (logger instanceof SmartLogger) {

@@ -45,7 +45,7 @@ public class LazyLogger extends AbstractScopedLogger {
         }
         StringBuilder logPrefix = new StringBuilder();
 
-        List<Pair<String, LinkedList<String>>> traces = SmartLoggerUtils.getAllTraceForPackage(JeefoLogger.packageName);
+        List<Pair<String, LinkedList<String>>> traces = LazyLoggerUtils.getAllTraceForPackage(JeefoLogger.packageName);
 
         for (Pair<String, LinkedList<String>> trace : traces) {
             logPrefix.append("[").append(TAG_KEY_CLASS).append(" ").append(trace.first).append("]");

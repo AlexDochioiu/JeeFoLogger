@@ -30,16 +30,16 @@ class StringUtils {
     /**
      * Computes the formatted message by replacing the placeholders with the values
      *
-     * todo: update docs descriptions for the method
-     *
      * @param ex      the exception whose message will be logged
      * @param message the message containing placeholders
      * @param args    the {@link Object} arguments to replace the placeholders
      * @return the formatted string message
      * <p>
-     * NOTE: If the number or type of placeholders does not match the arguments, the placeholders
-     * will be left untouched and the arguments will be listed as part of the log message (at the
-     * end of the message but before the exception message)
+     * NOTE: If there are more placeholders than arguments (or the type of a placeholder does not
+     * match the argument and the cast fails), the placeholders will be left untouched and the
+     * arguments will be listed as part of the log message (at the end of the message but before
+     * the exception message). If there are more arguments than placeholders, the extra arguments
+     * will be ignored.
      */
     static String getFormattedMessage(@Nullable Exception ex, @Nullable String message, Object... args) {
         StringBuilder formattedMessage = new StringBuilder();
@@ -70,13 +70,13 @@ class StringUtils {
 
     /**
      * Appends all the args at the end of a {@link StringBuilder} . toString() is called for the args.
-     *
+     * <p>
      * NOTE: This method should never be called unless there is a problem with doing String.format()
      * on the message (either args do not match placeholders or args are present when there's no
      * message)
      *
      * @param stringBuilder the {@link StringBuilder} to which we add the args at the end
-     * @param args the {@link Object} collection which will be added at the end of the string builder (using the toString() method)
+     * @param args          the {@link Object} collection which will be added at the end of the string builder (using the toString() method)
      */
     private static void appendArgsAtEndOfString(@NonNull StringBuilder stringBuilder, Object... args) {
         stringBuilder.append(" - args: ");

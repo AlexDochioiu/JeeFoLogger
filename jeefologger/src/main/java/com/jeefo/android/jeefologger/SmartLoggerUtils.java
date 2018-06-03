@@ -29,13 +29,14 @@ import java.util.Locale;
  */
 class SmartLoggerUtils {
 
-    @NonNull
-    static String getSimpleClassName(int depth) {
-        final StackTraceElement[] ste = Thread.currentThread().getStackTrace();
-
-        return getClassNameFromFileName(ste[depth].getFileName());
-    }
-
+    /**
+     * Queries a {@link List} of {@link StackTraceElement} for the first occurrence of a class
+     *
+     * @param className the full name (with package) of the class we are looking for in the trace list
+     * @param elements the {@link LinkedList} of {@link StackTraceElement} to be inspected
+     * @return the method name for the first occurrence of a given class or null if the class never
+     *          occurred in the list
+     */
     @Nullable
     static String getMethodName(String className, @Nullable LinkedList<StackTraceElement> elements) {
         if (elements == null) {
@@ -69,59 +70,37 @@ class SmartLoggerUtils {
         return methodName;
     }
 
+    /**
+     * Queries the stack trace for a simple class name
+     *
+     * @param depth the depth in the stack trace for the class we desire the name of
+     * @return the simple name of the class
+     */
+    @NonNull
+    static String getSimpleClassName(int depth) {
+        final StackTraceElement[] ste = Thread.currentThread().getStackTrace();
+
+        return getClassNameFromFileName(ste[depth].getFileName());
+    }
+
+    /**
+     * Queries the stack trace for a full class name, containing the package as well
+     *
+     * @param depth the depth in the stack trace for the class we desire the name of
+     * @return the full name of the class, including package
+     */
     static String getFullClassName(int depth) {
         final StackTraceElement[] ste = Thread.currentThread().getStackTrace();
 
         return ste[depth].getClassName();
     }
 
-    static List<Pair<String, LinkedList<String>>> getAllTraceForPackage(@NonNull String packageName) {
-        final StackTraceElement[] ste = Thread.currentThread().getStackTrace();
-        final LinkedList<Pair<String, LinkedList<String>>> packageCalls = new LinkedList<>();
-
-        for (int index = ste.length - 1; index >= 0; -- index) {
-            if (ste[index].getClassName().contains(packageName)) {
-                final boolean isAnonymousClass = ste[index].getClassName().contains("$");
-                final String className = getClassNameFromFileName(ste[index].getFileName());
-                String methodName = ste[index].getMethodName();
-
-                if (packageCalls.size() > 0) {
-                    if (className.equals(packageCalls.getLast().first)) {
-                        if (!isAnonymousClass) {
-                            // add a second method to the same class then continue
-                                packageCalls.getLast().second.add(methodName);
-
-                        } else {
-                            final String callingMethodName = packageCalls.getLast().second.removeLast();
-                            methodName = String.format("%s <- %s#%s(args)", methodName, packageCalls.getLast().first, callingMethodName);
-                            packageCalls.getLast().second.add(methodName);
-                        }
-                        continue;
-                    }
-                }
-
-                if (!isAnonymousClass) {
-                    final LinkedList<String> methodCalls = new LinkedList<>();
-                    methodCalls.add(ste[index].getMethodName());
-
-                    packageCalls.add(new Pair<>(className, methodCalls));
-                } else {
-                    StringBuilder callingMethodsName = new StringBuilder();
-                    for (String methdCall : packageCalls.getLast().second) {
-                        callingMethodsName.append('#').append(methdCall).append("(args)");
-                    }
-                    methodName = String.format("%s <- %s%s", methodName, packageCalls.getLast().first, callingMethodsName.toString());
-                    packageCalls.removeLast();
-                    packageCalls.getLast().second.add(methodName);
-                }
-            }
-        }
-
-        return packageCalls;
-    }
-
+    /**
+     * @param fileName the name of the class file
+     * @return the simple name of the class
+     */
     @NonNull
-    private static String getClassNameFromFileName(@NonNull String fileName) {
+    static String getClassNameFromFileName(@NonNull String fileName) {
         return fileName.substring(0, fileName.indexOf('.'));
     }
 }

@@ -28,8 +28,20 @@ import java.util.LinkedList;
  * Concurrent logger used for creating a pass-through trace which will improve drastically the readability of
  * the logged messages as well as decrease the debugging time when bugs/ crashes arise. For ease of
  * use, the messages contain placeholders ('%s') and String params which will replace them.
+ * </p>
  * <p>
  * It logs all the messages to Logcat as well as to a persistent file (if activated).
+ * </p>
+ * <p>
+ * Compared to {@link SmartLogger} and {@link LazyLogger}, this is the most powerful and
+ * efficient {@link ILog}, as it gives more control over the Scoping of TAGS. However, it also
+ * requires the most explicit construction.
+ * </p>
+ * <p>
+ * This in combination with the {@link SmartLogger} are recommended for use in production, whereas the
+ * {@link LazyLogger} is designed to mainly be a debugging tool used for quickly tracing the source
+ * of any problems during development stage.
+ * </p>
  */
 @SuppressWarnings({"WeakerAccess", "RedundantCast", "unchecked"})
 public class ScopedLogger extends AbstractScopedLogger {
@@ -223,6 +235,9 @@ public class ScopedLogger extends AbstractScopedLogger {
         ErrorReflection((LinkedList) null, exception, "");
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     String getMessageLogPrefix() {
         return getLoggingPrefix();
