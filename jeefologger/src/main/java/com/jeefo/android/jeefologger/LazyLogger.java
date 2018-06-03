@@ -21,12 +21,10 @@ import android.util.Pair;
 import java.util.LinkedList;
 import java.util.List;
 
-import static com.jeefo.android.jeefologger.SmartLoggerUtils.getAllTraceForPackage;
-
 /**
  * Created by Alexandru Iustin Dochioiu on 6/2/2018
  */
-@SuppressWarnings("unchecked")
+@SuppressWarnings({"unchecked", "RedundantCast"})
 public class LazyLogger extends AbstractScopedLogger {
 
     /**
@@ -47,13 +45,11 @@ public class LazyLogger extends AbstractScopedLogger {
         }
         StringBuilder logPrefix = new StringBuilder();
 
-        List<Pair<String, List<String>>> traces = SmartLoggerUtils.getAllTraceForPackage(JeefoLogger.packageName);
+        List<Pair<String, LinkedList<String>>> traces = SmartLoggerUtils.getAllTraceForPackage(JeefoLogger.packageName);
 
-        for (int index = traces.size() - 1; index >= 0; --index) {
-            final Pair<String, List<String>> trace = traces.get(index);
+        for (Pair<String, LinkedList<String>> trace : traces) {
             logPrefix.append("[").append(TAG_KEY_CLASS).append(" ").append(trace.first).append("]");
-            for (int methodIndex = trace.second.size() - 1; methodIndex >= 0; --methodIndex) {
-                final String methodName = trace.second.get(methodIndex);
+            for (final String methodName : trace.second) {
                 logPrefix.append("[").append(TAG_KEY_METHOD).append(" ").append(methodName).append("]");
             }
         }
