@@ -26,6 +26,8 @@ import com.jeefo.android.jeefologger.ScopedLogger;
 import com.jeefo.android.jeefologger.SmartLoggerFactory;
 import com.jeefo.android.logger.utils.RunnableUtils;
 
+import java.io.File;
+
 
 public class MainActivity extends AppCompatActivity {
     private ILog logger = SmartLoggerFactory.createSmartLogger();
@@ -53,9 +55,12 @@ public class MainActivity extends AppCompatActivity {
 
         ILog newSmartLogger = SmartLoggerFactory.createSmartLogger(logger);
 //        newSmartLogger.Info("Now we're fucked");
+        File[] logFiles;
+        logFiles = JeefoLogger.getAllLogFiles();
 
         JeefoLogger.initPersistence(this);
 
+        logFiles = JeefoLogger.getAllLogFiles();
 //        logger.Error(new IllegalArgumentException("ArgExc"));
 //        logger.Warn(new IllegalStateException("exc"), "Exception added: %s", "IllegalStateExc");
 
@@ -79,6 +84,8 @@ public class MainActivity extends AppCompatActivity {
 
         //acceptable message as the string.format works
 //        secondNewLog.Info("Message with placeholders which will not be displayed. %s", "whatever", 2, 3.2, logger);
+
+
 
         runnable = new Runnable() {
             @Override
@@ -105,6 +112,8 @@ public class MainActivity extends AppCompatActivity {
         RunnableUtils.runMyRunnable(outerRunnable);
         RunnableUtils.callRunMyRunnable(outerRunnable);
         intermediateMethod();
+
+        logFiles = JeefoLogger.getAllLogFiles();
     }
 
     void callMainRunnable() {
