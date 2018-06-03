@@ -28,6 +28,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 
 /**
@@ -36,6 +37,7 @@ import java.util.Locale;
 
 class PersistentLogger implements ILog {
     private static boolean wasInitialised = false;
+    private static File logsPath;
     private static File logFile;
 
     private static final Object lockObject = new Object();
@@ -62,15 +64,23 @@ class PersistentLogger implements ILog {
                 }
 
                 //TODO: Move log files into a private dir
-                File dirPath;
                 if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
-                    dirPath = applicationContext.getExternalFilesDir(Environment.DIRECTORY_DCIM);
+                    logsPath = applicationContext.getExternalFilesDir(Environment.DIRECTORY_DCIM);
                 } else {
-                    dirPath = applicationContext.getFilesDir();
+                    logsPath = applicationContext.getFilesDir();
+                }
+
+                try {
+                    File newLogsPath = new File(logsPath, "jeefoLogFiles");
+                    if (newLogsPath.exists() || newLogsPath.mkdir()) {
+                        logsPath = newLogsPath;
+                    }
+                } catch (Exception e) {
+                    Log.d("JeeFo-Log-Internal", "Failed to create logs directory, use default DCIM instead ; " + e.getMessage());
                 }
 
                 final String timeStamp = new SimpleDateFormat("yyyy_MM_dd", Locale.UK).format(new Date());
-                logFile = new File(dirPath, timeStamp + "_Log.txt");
+                logFile = new File(logsPath, timeStamp + "_Log.txt");
                 BufferedWriter outStream = null;
 
                 try {
@@ -95,6 +105,19 @@ class PersistentLogger implements ILog {
                     }
                 }
             }
+        }
+    }
+
+    /**
+     * @return array of all the log files as long as the persistent logging was initialized;
+     *              null if the persistent logging was not initialized
+     */
+    @Nullable
+    static File[] getAllLogFiles() {
+        if (wasInitialised) {
+            return logsPath.listFiles();
+        } else {
+            return null;
         }
     }
 

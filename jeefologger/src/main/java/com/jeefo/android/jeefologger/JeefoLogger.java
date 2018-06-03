@@ -21,6 +21,9 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
+import java.io.File;
+import java.util.List;
+
 import static com.jeefo.android.jeefologger.StringUtils.getFormattedMessage;
 
 /**
@@ -160,5 +163,17 @@ public class JeefoLogger implements ILog {
      */
     public static int clearPersistentTags() {
         return PersistentTagsManager.clearPersistentTags();
+    }
+
+    /**
+     * Each {@link File} object will have the name following the structure:
+     *                      yyyy_mm_dd_Log.txt
+     *
+     * @return array of all the log files as long as the persistent logging was initialized;
+     *              null if the persistent logging was not initialized
+     */
+    @Nullable
+    public static File[] getAllLogFiles() {
+        return PersistentLogger.getAllLogFiles();
     }
 }
