@@ -2,8 +2,8 @@ apply plugin: 'com.android.library'
 apply plugin: 'com.github.dcendents.android-maven'
 apply plugin: 'com.jfrog.bintray'
 
-def logLibraryVersion = "0.1.1"
-def logLibraryVersionCode = 2
+def logLibraryVersion = "1.0.0"
+def logLibraryVersionCode = 3
 
 android {
     compileSdkVersion 27
@@ -46,7 +46,9 @@ ext {
     artifact = 'jeefologger' // has to be same as your library module name
     libraryDescription = 'Logging library for android which provides the scope dimension for tracing log messages and their sources. It also provides the possibility of adding persistence to all the log messages as well as sticky tags which would appear in every message'
     siteUrl = 'https://github.com/AlexDochioiu/Logger'
+    issuesUrl = 'https://github.com/AlexDochioiu/Logger/issues'
     gitUrl = 'https://github.com/AlexDochioiu/Logger.git'
+    libLabels = ['Android', 'Logger', 'JeeFoLogger', "JeeFo", "Persistence"]
     libraryVersion = logLibraryVersion
     developerId = 'jeefo'
     developerName = 'AlexDochioiu'
@@ -133,6 +135,8 @@ bintray {
         desc = libraryDescription
         websiteUrl = siteUrl
         vcsUrl = gitUrl
+        labels = libLabels
+        issueTrackerUrl = issuesUrl
         licenses = allLicenses
         publish = true
         publicDownloadNumbers = true

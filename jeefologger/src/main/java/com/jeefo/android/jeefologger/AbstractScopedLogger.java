@@ -39,6 +39,9 @@ abstract class AbstractScopedLogger implements ILog {
         return loggingPrefix;
     }
 
+    /**
+     * @return the {@link String} prefix for the logging message including all the tags
+     */
     abstract String getMessageLogPrefix();
 
     /**
@@ -74,7 +77,13 @@ abstract class AbstractScopedLogger implements ILog {
         }
     }
 
-    synchronized void DebugReflection(final LinkedList<StackTraceElement> traceElements, String messageToLog, Object... args) {
+    /**
+     * @param traceElements the stackTrace (can be null) used by the {@link SmartLogger} when
+     *                      computing the logging prefix
+     * @param messageToLog  the message to be logged
+     * @param args          arguments for messageToLog
+     */
+    synchronized void DebugReflection(@Nullable final LinkedList<StackTraceElement> traceElements, String messageToLog, Object... args) {
         this.traceElements = traceElements;
 
         try {
@@ -90,6 +99,13 @@ abstract class AbstractScopedLogger implements ILog {
         }
     }
 
+    /**
+     * @param traceElements the stackTrace (can be null) used by the {@link SmartLogger} when
+     *                      computing the logging prefix
+     * @param exception     the exception to be logged
+     * @param messageToLog  the message to be logged
+     * @param args          arguments for messageToLog
+     */
     synchronized void DebugReflection(final LinkedList<StackTraceElement> traceElements, Exception exception, String messageToLog, Object... args) {
         this.traceElements = traceElements;
 
@@ -106,6 +122,12 @@ abstract class AbstractScopedLogger implements ILog {
         }
     }
 
+    /**
+     * @param traceElements the stackTrace (can be null) used by the {@link SmartLogger} when
+     *                      computing the logging prefix
+     * @param messageToLog  the message to be logged
+     * @param args          arguments for messageToLog
+     */
     synchronized void InfoReflection(final LinkedList<StackTraceElement> traceElements, String messageToLog, Object... args) {
         this.traceElements = traceElements;
 
@@ -122,6 +144,12 @@ abstract class AbstractScopedLogger implements ILog {
         }
     }
 
+    /**
+     * @param traceElements the stackTrace (can be null) used by the {@link SmartLogger} when
+     *                      computing the logging prefix
+     * @param messageToLog  the message to be logged
+     * @param args          arguments for messageToLog
+     */
     synchronized void WarnReflection(final LinkedList<StackTraceElement> traceElements, String messageToLog, Object... args) {
         this.traceElements = traceElements;
 
@@ -138,6 +166,13 @@ abstract class AbstractScopedLogger implements ILog {
         }
     }
 
+    /**
+     * @param traceElements the stackTrace (can be null) used by the {@link SmartLogger} when
+     *                      computing the logging prefix
+     * @param exception     the exception to be logged
+     * @param messageToLog  the message to be logged
+     * @param args          arguments for messageToLog
+     */
     synchronized void WarnReflection(final LinkedList<StackTraceElement> traceElements, Exception exception, String messageToLog, Object... args) {
         this.traceElements = traceElements;
 
@@ -154,6 +189,12 @@ abstract class AbstractScopedLogger implements ILog {
         }
     }
 
+    /**
+     * @param traceElements the stackTrace (can be null) used by the {@link SmartLogger} when
+     *                      computing the logging prefix
+     * @param messageToLog  the message to be logged
+     * @param args          arguments for messageToLog
+     */
     synchronized void ErrorReflection(final LinkedList<StackTraceElement> traceElements, String messageToLog, Object... args) {
         this.traceElements = traceElements;
 
@@ -170,6 +211,13 @@ abstract class AbstractScopedLogger implements ILog {
         }
     }
 
+    /**
+     * @param traceElements the stackTrace (can be null) used by the {@link SmartLogger} when
+     *                      computing the logging prefix
+     * @param exception     the exception to be logged
+     * @param messageToLog  the message to be logged
+     * @param args          arguments for messageToLog
+     */
     synchronized void ErrorReflection(final LinkedList<StackTraceElement> traceElements, Exception exception, String messageToLog, Object... args) {
         this.traceElements = traceElements;
 
