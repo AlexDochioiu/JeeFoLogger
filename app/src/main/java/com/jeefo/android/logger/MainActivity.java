@@ -29,6 +29,8 @@ import com.jeefo.android.logger.utils.RunnableUtils;
 
 public class MainActivity extends AppCompatActivity {
     private ILog logger = SmartLoggerFactory.createSmartLogger();
+    private Runnable runnable;
+    private Runnable outerRunnable;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -78,28 +80,38 @@ public class MainActivity extends AppCompatActivity {
         //acceptable message as the string.format works
 //        secondNewLog.Info("Message with placeholders which will not be displayed. %s", "whatever", 2, 3.2, logger);
 
-        Runnable runnable = new Runnable() {
+        runnable = new Runnable() {
             @Override
             public void run() {
-                logger.Debug("Inside the runnable");
-                ILog rLogger = SmartLoggerFactory.createSmartLogger(logger);
-                rLogger.Error("rLogger MainActivity");
+                //logger.Debug("Inside the runnable");
+                //ILog rLogger = SmartLoggerFactory.createSmartLogger(logger);
+                //rLogger.Error("rLogger MainActivity");
                 ILog ll = new LazyLogger();
                 ll.Info("test");
             }
         };
-        Runnable outerRunnable = new Runnable() {
+        outerRunnable = new Runnable() {
             @Override
             public void run() {
-                logger.Debug("runnable ran inside utils class");
+                logger.Debug("MainActivity SmartLogger");
                 ILog rLogger = SmartLoggerFactory.createSmartLogger(logger);
-                rLogger.Error("rLogger Utils");
+                rLogger.Error("new SmartLogger");
                 ILog ll = new LazyLogger();
-                ll.Info("test");
+                ll.Info("LazyLogger Message");
             }
         };
 
         runnable.run();
         RunnableUtils.runMyRunnable(outerRunnable);
+        RunnableUtils.callRunMyRunnable(outerRunnable);
+        intermediateMethod();
+    }
+
+    void callMainRunnable() {
+        outerRunnable.run();
+    }
+
+    void intermediateMethod() {
+        callMainRunnable();
     }
 }

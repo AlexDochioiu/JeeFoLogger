@@ -53,7 +53,7 @@ class SmartLoggerUtils {
                 anonymousHostClassName = elementClassName.substring(0, elementClassName.indexOf('$'));
             }
 
-            if (className.compareTo(elementClassName) == 0 || ( anonymousHostClassName != null && className.compareTo(anonymousHostClassName) == 0 )) {
+            if (className.compareTo(elementClassName) == 0 || (anonymousHostClassName != null && className.compareTo(anonymousHostClassName) == 0)) {
                 methodName = elements.getFirst().getMethodName();
                 elements.removeFirst();
 
@@ -75,28 +75,45 @@ class SmartLoggerUtils {
         return ste[depth].getClassName();
     }
 
-    static List<Pair<String, List<String>>> getAllTraceForPackage(String packageName) {
+    static List<Pair<String, LinkedList<String>>> getAllTraceForPackage(@NonNull String packageName) {
         final StackTraceElement[] ste = Thread.currentThread().getStackTrace();
-        final List<Pair<String, List<String>>> packageCalls = new LinkedList<>();
+        final LinkedList<Pair<String, LinkedList<String>>> packageCalls = new LinkedList<>();
 
-        for (StackTraceElement traceElement : ste) {
-            if (traceElement.getClassName().contains(packageName)) {
-                //todo: use the full class name with package to compare if one class is the same or not
-                final String className = getClassNameFromFileName(traceElement.getFileName());
-                final String methodName = traceElement.getMethodName();
+        for (int index = ste.length - 1; index >= 0; -- index) {
+            if (ste[index].getClassName().contains(packageName)) {
+                final boolean isAnonymousClass = ste[index].getClassName().contains("$");
+                final String className = getClassNameFromFileName(ste[index].getFileName());
+                String methodName = ste[index].getMethodName();
 
                 if (packageCalls.size() > 0) {
-                    if (className.equals(packageCalls.get(packageCalls.size() - 1).first)) {
-                        // add a second method to the same class then continue
-                        packageCalls.get(packageCalls.size() - 1).second.add(methodName);
+                    if (className.equals(packageCalls.getLast().first)) {
+                        if (!isAnonymousClass) {
+                            // add a second method to the same class then continue
+                                packageCalls.getLast().second.add(methodName);
+
+                        } else {
+                            final String callingMethodName = packageCalls.getLast().second.removeLast();
+                            methodName = String.format("%s <- %s#%s(args)", methodName, packageCalls.getLast().first, callingMethodName);
+                            packageCalls.getLast().second.add(methodName);
+                        }
                         continue;
                     }
                 }
 
-                final List<String> methodCalls = new LinkedList<>();
-                methodCalls.add(traceElement.getMethodName());
+                if (!isAnonymousClass) {
+                    final LinkedList<String> methodCalls = new LinkedList<>();
+                    methodCalls.add(ste[index].getMethodName());
 
-                packageCalls.add(new Pair<>(className, methodCalls));
+                    packageCalls.add(new Pair<>(className, methodCalls));
+                } else {
+                    StringBuilder callingMethodsName = new StringBuilder();
+                    for (String methdCall : packageCalls.getLast().second) {
+                        callingMethodsName.append('#').append(methdCall).append("(args)");
+                    }
+                    methodName = String.format("%s <- %s%s", methodName, packageCalls.getLast().first, callingMethodsName.toString());
+                    packageCalls.removeLast();
+                    packageCalls.getLast().second.add(methodName);
+                }
             }
         }
 
@@ -106,9 +123,5 @@ class SmartLoggerUtils {
     @NonNull
     private static String getClassNameFromFileName(@NonNull String fileName) {
         return fileName.substring(0, fileName.indexOf('.'));
-    }
-
-    public static boolean checkRunnable(int depth) {
-        return Thread.currentThread().getStackTrace()[depth].getClassName().contains("$");
     }
 }

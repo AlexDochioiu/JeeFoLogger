@@ -7,4 +7,8 @@ public class RunnableUtils {
     public static void runMyRunnable(Runnable runnable) {
         runnable.run();
     }
+
+    public static void callRunMyRunnable(Runnable runnable) {
+        runMyRunnable(runnable);
+    }
 }
