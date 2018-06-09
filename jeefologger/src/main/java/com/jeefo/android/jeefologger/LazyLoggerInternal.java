@@ -14,26 +14,57 @@
  * limitations under the License.
  */
 
-
 package com.jeefo.android.jeefologger;
 
+import android.util.Pair;
+
+import java.util.LinkedList;
+import java.util.List;
+
 /**
- * Created by Alexandru Iustin Dochioiu on 6/9/2018
- *
- * Static class used for accessing the power of the {@link LazyLoggerInternal}
- * NOTE: In order to use those static methods, you NEED to initialize the lazy logger beforehand
- *  --JeefoLogger.initLazyLogger(Context)--
+ * Created by Alexandru Iustin Dochioiu on 6/2/2018
  */
-public class LazyLogger {
-    private static final ILog lazyLoggerImplementation = new LazyLoggerInternal();
+@SuppressWarnings({"unchecked", "RedundantCast"})
+class LazyLoggerInternal extends AbstractScopedLogger {
+
+    /**
+     * Constructor
+     */
+    LazyLoggerInternal() {
+        initLogger(null);
+    }
+
+    /**
+     * @return the prefix containing the tags
+     * @throws ExceptionInInitializerError if this method is called before JeefoLogger.initLazyLogger(Context)
+     */
+    @Override
+    String getMessageLogPrefix() {
+        if (JeefoLogger.packageName == null) {
+            throw new ExceptionInInitializerError("JeefoLogger.initLazyLogger(Context) should have been called before logging a message with this logger");
+        }
+        StringBuilder logPrefix = new StringBuilder();
+
+        List<Pair<String, LinkedList<String>>> traces = LazyLoggerUtils.getAllTraceForPackage(JeefoLogger.packageName);
+
+        for (Pair<String, LinkedList<String>> trace : traces) {
+            logPrefix.append("[").append(TAG_KEY_CLASS).append(" ").append(trace.first).append("]");
+            for (final String methodName : trace.second) {
+                logPrefix.append("[").append(TAG_KEY_METHOD).append(" ").append(methodName).append("]");
+            }
+        }
+
+        return logPrefix.append(" ").toString();
+    }
 
     /**
      * @param messageToLog the message to be logged
      * @param args         arguments for messageToLog
      * @throws ExceptionInInitializerError if this method is called before JeefoLogger.initLazyLogger(Context)
      */
-    public static void Debug(String messageToLog, Object... args) {
-        lazyLoggerImplementation.Debug(messageToLog, args);
+    @Override
+    public void Debug(String messageToLog, Object... args) {
+        DebugReflection((LinkedList) null, messageToLog, args);
     }
 
     /**
@@ -42,8 +73,9 @@ public class LazyLogger {
      * @param args         arguments for messageToLog
      * @throws ExceptionInInitializerError if this method is called before JeefoLogger.initLazyLogger(Context)
      */
-    public static void Debug(Exception exception, String messageToLog, Object... args) {
-        lazyLoggerImplementation.Debug(exception, messageToLog, args);
+    @Override
+    public void Debug(Exception exception, String messageToLog, Object... args) {
+        DebugReflection((LinkedList) null, exception, messageToLog, args);
     }
 
     /**
@@ -51,8 +83,9 @@ public class LazyLogger {
      * @param args         arguments for messageToLog
      * @throws ExceptionInInitializerError if this method is called before JeefoLogger.initLazyLogger(Context)
      */
-    public static void Info(String messageToLog, Object... args) {
-        lazyLoggerImplementation.Info(messageToLog, args);
+    @Override
+    public void Info(String messageToLog, Object... args) {
+        InfoReflection((LinkedList) null, messageToLog, args);
     }
 
     /**
@@ -60,27 +93,9 @@ public class LazyLogger {
      * @param args         arguments for messageToLog
      * @throws ExceptionInInitializerError if this method is called before JeefoLogger.initLazyLogger(Context)
      */
-    public static void Warn(String messageToLog, Object... args) {
-        lazyLoggerImplementation.Warn(messageToLog, args);
-    }
-
-    /**
-     * @param exception    the exception to be logged
-     * @param messageToLog the message to be logged
-     * @param args         arguments for messageToLog
-     * @throws ExceptionInInitializerError if this method is called before JeefoLogger.initLazyLogger(Context)
-     */
-    public static void Warn(Exception exception, String messageToLog, Object... args) {
-        lazyLoggerImplementation.Warn(exception, messageToLog, args);
-    }
-
-    /**
-     * @param messageToLog the message to be logged
-     * @param args         arguments for messageToLog
-     * @throws ExceptionInInitializerError if this method is called before JeefoLogger.initLazyLogger(Context)
-     */
-    public static void Error(String messageToLog, Object... args) {
-        lazyLoggerImplementation.Error(messageToLog, args);
+    @Override
+    public void Warn(String messageToLog, Object... args) {
+        WarnReflection((LinkedList) null, messageToLog, args);
     }
 
     /**
@@ -89,21 +104,38 @@ public class LazyLogger {
      * @param args         arguments for messageToLog
      * @throws ExceptionInInitializerError if this method is called before JeefoLogger.initLazyLogger(Context)
      */
-    public static void Error(Exception exception, String messageToLog, Object... args) {
-        lazyLoggerImplementation.Error(exception, messageToLog, args);
+    @Override
+    public void Warn(Exception exception, String messageToLog, Object... args) {
+        WarnReflection((LinkedList) null, exception, messageToLog, args);
+    }
+
+    /**
+     * @param messageToLog the message to be logged
+     * @param args         arguments for messageToLog
+     * @throws ExceptionInInitializerError if this method is called before JeefoLogger.initLazyLogger(Context)
+     */
+    @Override
+    public void Error(String messageToLog, Object... args) {
+        ErrorReflection((LinkedList) null, messageToLog, args);
+    }
+
+    /**
+     * @param exception    the exception to be logged
+     * @param messageToLog the message to be logged
+     * @param args         arguments for messageToLog
+     * @throws ExceptionInInitializerError if this method is called before JeefoLogger.initLazyLogger(Context)
+     */
+    @Override
+    public void Error(Exception exception, String messageToLog, Object... args) {
+        ErrorReflection((LinkedList) null, exception, messageToLog, args);
     }
 
     /**
      * @param exception the exception to be logged
      * @throws ExceptionInInitializerError if this method is called before JeefoLogger.initLazyLogger(Context)
      */
-    public static void Error(Exception exception) {
-        lazyLoggerImplementation.Error(exception);
-    }
-
-    /**
-     * Private Constructor to avoid initialization
-     */
-    private LazyLogger() {
+    @Override
+    public void Error(Exception exception) {
+        ErrorReflection((LinkedList) null, exception, "");
     }
 }

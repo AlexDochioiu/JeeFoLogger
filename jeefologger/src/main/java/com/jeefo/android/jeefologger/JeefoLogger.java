@@ -22,7 +22,6 @@ import android.support.annotation.Nullable;
 import android.util.Log;
 
 import java.io.File;
-import java.util.List;
 
 import static com.jeefo.android.jeefologger.StringUtils.getFormattedMessage;
 
@@ -51,7 +50,7 @@ public class JeefoLogger implements ILog {
      */
     public static void initPersistence(@NonNull Context context) {
         PersistentLogger.init(context);
-        initDebugLogger(context);
+        initLazyLogger(context);
     }
 
     /**
@@ -60,7 +59,7 @@ public class JeefoLogger implements ILog {
      *
      * @param context any kind of context
      */
-    public static void initDebugLogger(@NonNull Context context) { packageName = context.getPackageName(); }
+    public static void initLazyLogger(@NonNull Context context) { packageName = context.getPackageName(); }
 
     @Override
     public void Debug(String messageToLog, Object... args) {

@@ -19,6 +19,7 @@ package com.jeefo.android.jeefologger;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import java.util.Arrays;
 import java.util.LinkedList;
 
 
@@ -153,7 +154,7 @@ public class ScopedLogger extends AbstractScopedLogger {
      */
     @Override
     public synchronized void Debug(String messageToLog, Object... args) {
-        DebugReflection((LinkedList) null, " " + messageToLog, args);
+        DebugReflection(new LinkedList<>(Arrays.asList(Thread.currentThread().getStackTrace())), " " + messageToLog, args);
     }
 
     /**
@@ -165,7 +166,7 @@ public class ScopedLogger extends AbstractScopedLogger {
      */
     @Override
     public synchronized void Debug(Exception exception, String messageToLog, Object... args) {
-        DebugReflection((LinkedList) null, exception, " " + messageToLog, args);
+        DebugReflection(new LinkedList<>(Arrays.asList(Thread.currentThread().getStackTrace())), exception, " " + messageToLog, args);
     }
 
     /**
@@ -176,7 +177,7 @@ public class ScopedLogger extends AbstractScopedLogger {
      */
     @Override
     public synchronized void Info(String messageToLog, Object... args) {
-        InfoReflection((LinkedList) null, " " + messageToLog, args);
+        InfoReflection(new LinkedList<>(Arrays.asList(Thread.currentThread().getStackTrace())), " " + messageToLog, args);
     }
 
     /**
@@ -187,7 +188,7 @@ public class ScopedLogger extends AbstractScopedLogger {
      */
     @Override
     public synchronized void Warn(String messageToLog, Object... args) {
-        WarnReflection((LinkedList) null, " " + messageToLog, args);
+        WarnReflection(new LinkedList<>(Arrays.asList(Thread.currentThread().getStackTrace())), " " + messageToLog, args);
     }
 
     /**
@@ -199,7 +200,7 @@ public class ScopedLogger extends AbstractScopedLogger {
      */
     @Override
     public synchronized void Warn(Exception exception, String messageToLog, Object... args) {
-        WarnReflection((LinkedList) null, exception, " " + messageToLog, args);
+        WarnReflection(new LinkedList<>(Arrays.asList(Thread.currentThread().getStackTrace())), exception, " " + messageToLog, args);
     }
 
     /**
@@ -210,7 +211,7 @@ public class ScopedLogger extends AbstractScopedLogger {
      */
     @Override
     public synchronized void Error(String messageToLog, Object... args) {
-        ErrorReflection((LinkedList) null, " " + messageToLog, args);
+        ErrorReflection(new LinkedList<>(Arrays.asList(Thread.currentThread().getStackTrace())), " " + messageToLog, args);
     }
 
     /**
@@ -222,7 +223,7 @@ public class ScopedLogger extends AbstractScopedLogger {
      */
     @Override
     public synchronized void Error(Exception exception, String messageToLog, Object... args) {
-        ErrorReflection((LinkedList) null, exception, " " + messageToLog, args);
+        ErrorReflection(new LinkedList<>(Arrays.asList(Thread.currentThread().getStackTrace())), exception, " " + messageToLog, args);
     }
 
     /**
@@ -232,7 +233,7 @@ public class ScopedLogger extends AbstractScopedLogger {
      */
     @Override
     public synchronized void Error(Exception exception) {
-        ErrorReflection((LinkedList) null, exception, "");
+        ErrorReflection(new LinkedList<>(Arrays.asList(Thread.currentThread().getStackTrace())), exception, "");
     }
 
     /**

@@ -111,11 +111,11 @@ class SmartLogger extends AbstractScopedLogger {
     @Override
     String getMessageLogPrefix() {
 
-        final String methodName = SmartLoggerUtils.getMethodName(fullClientClassName, traceElements);
+        final String methodName = SmartLoggerUtils.getMethodsName(fullClientClassName, traceElements);
         StringBuilder messageLogPrefix = new StringBuilder();
         messageLogPrefix.append(getLoggingPrefix());
 
-        if (methodName != null) {
+        if (methodName != null && !methodName.equals("")) {
             messageLogPrefix.append("[").append(TAG_KEY_METHOD).append(" ").append(methodName).append("]");
         }
 

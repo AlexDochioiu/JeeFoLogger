@@ -18,7 +18,6 @@ package com.jeefo.android.jeefologger;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.util.Pair;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -29,21 +28,24 @@ import java.util.Locale;
  */
 class SmartLoggerUtils {
 
+
     /**
-     * Queries a {@link List} of {@link StackTraceElement} for the first occurrence of a class
+     * Queries a {@link List} of {@link StackTraceElement} for the first sequence of a class (sequance
+     * because we are interested in the methods chaining inside the class)
      *
      * @param className the full name (with package) of the class we are looking for in the trace list
      * @param elements the {@link LinkedList} of {@link StackTraceElement} to be inspected
-     * @return the method name for the first occurrence of a given class or null if the class never
+     * @return the methods name for the first sequence of a given class or empty string if the class never
      *          occurred in the list
      */
-    @Nullable
-    static String getMethodName(String className, @Nullable LinkedList<StackTraceElement> elements) {
+    @NonNull
+    static String getMethodsName(String className, @Nullable LinkedList<StackTraceElement> elements) {
         if (elements == null) {
-            return null;
+            return "";
         }
 
-        String methodName = null;
+        String methodName = "";
+        boolean foundMethod = false;
 
         while (elements.size() > 0) {
             String elementClassName = elements.getFirst().getClassName();
@@ -55,13 +57,25 @@ class SmartLoggerUtils {
             }
 
             if (className.compareTo(elementClassName) == 0 || (anonymousHostClassName != null && className.compareTo(anonymousHostClassName) == 0)) {
-                methodName = elements.getFirst().getMethodName();
+                if (!foundMethod) {
+                    methodName = elements.getFirst().getMethodName();
+                } else {
+                    methodName = String.format(Locale.UK, "%s#%s", elements.getFirst().getMethodName(), methodName);
+                }
                 elements.removeFirst();
 
                 if (anonymousHostClassName != null) {
-                    methodName = String.format(Locale.UK, "%s <- %s#%s(args)", methodName, getClassNameFromFileName(elements.getFirst().getFileName()), elements.getFirst().getMethodName());
+                    methodName = String.format(Locale.UK, "%s <- %s#%s()", methodName, getClassNameFromFileName(elements.getFirst().getFileName()), elements.getFirst().getMethodName());
                     elements.removeFirst();
                 }
+
+                if (!foundMethod) {
+                    foundMethod = true;
+                    continue; // to avoid removing another stack trace element
+                }
+            }
+
+            if (foundMethod) {
                 break;
             }
             elements.removeFirst();
