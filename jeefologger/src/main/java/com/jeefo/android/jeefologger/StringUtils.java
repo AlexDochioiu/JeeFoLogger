@@ -19,6 +19,8 @@ package com.jeefo.android.jeefologger;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import java.util.Locale;
+
 /**
  * Created by Alexandru Iustin Dochioiu on 5/26/2018
  */
@@ -47,7 +49,7 @@ class StringUtils {
         if (message != null && !message.equals("")) {
             // if there's a message, try and format it
             try {
-                formattedMessage.append(String.format(message, args));
+                formattedMessage.append(String.format(Locale.UK, message, args));
             } catch (Exception e) {
                 // if formatting failed, add the message and the args separately and the end
                 formattedMessage.append(message);

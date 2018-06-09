@@ -21,6 +21,7 @@ import android.util.Pair;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 
 import static com.jeefo.android.jeefologger.SmartLoggerUtils.getClassNameFromFileName;
 
@@ -46,7 +47,7 @@ public class LazyLoggerUtils {
             if (ste[index].getClassName().contains(packageName)) {
                 final boolean isAnonymousClass = ste[index].getClassName().contains("$");
                 final String className = getClassNameFromFileName(ste[index].getFileName());
-                String methodName = ste[index].getMethodName();
+                String methodName = ste[index].getMethodName() + "()";
 
                 if (packageCalls.size() > 0) {
                     if (className.equals(packageCalls.getLast().first)) {
@@ -56,7 +57,7 @@ public class LazyLoggerUtils {
 
                         } else {
                             final String callingMethodName = packageCalls.getLast().second.removeLast();
-                            methodName = String.format("%s <- %s#%s(args)", methodName, packageCalls.getLast().first, callingMethodName);
+                            methodName = String.format(Locale.UK, "%s <- %s#%s", methodName, packageCalls.getLast().first, callingMethodName);
                             packageCalls.getLast().second.add(methodName);
                         }
                         continue;
@@ -70,10 +71,10 @@ public class LazyLoggerUtils {
                     packageCalls.add(new Pair<>(className, methodCalls));
                 } else {
                     StringBuilder callingMethodsName = new StringBuilder();
-                    for (String methdCall : packageCalls.getLast().second) {
-                        callingMethodsName.append('#').append(methdCall).append("(args)");
+                    for (String methodCall : packageCalls.getLast().second) {
+                        callingMethodsName.append('#').append(methodCall);
                     }
-                    methodName = String.format("%s <- %s%s", methodName, packageCalls.getLast().first, callingMethodsName.toString());
+                    methodName = String.format(Locale.UK, "%s <- %s%s()", methodName, packageCalls.getLast().first, callingMethodsName.toString());
                     packageCalls.removeLast();
                     packageCalls.getLast().second.add(methodName);
                 }

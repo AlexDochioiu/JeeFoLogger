@@ -18,6 +18,8 @@ package com.jeefo.android.jeefologger;
 
 import android.support.annotation.NonNull;
 
+import java.util.Locale;
+
 /**
  * Created by Alexandru Iustin Dochioiu on 5/27/2018
  */
@@ -82,7 +84,7 @@ final class PersistentTag {
      */
     @Override
     public String toString() {
-        return String.format("[%s %s]", key, value);
+        return String.format(Locale.UK, "[%s %s]", key, value);
     }
 
     /**

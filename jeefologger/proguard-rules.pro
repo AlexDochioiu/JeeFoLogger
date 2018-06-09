@@ -20,6 +20,11 @@
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
 
+-keepclassmembers class * extends com.jeefo.android.jeefologger.AbstractScopedLogger{ *; }
 -keepclassmembers class * extends com.jeefo.android.jeefologger.JeefoLogger{ *; }
+-keepclassmembers class * extends com.jeefo.android.jeefologger.LazyLoggerInternal{ *; }
 -keepclassmembers class * extends com.jeefo.android.jeefologger.ScopedLogger{ *; }
 -keepclassmembers class * extends com.jeefo.android.jeefologger.PersistentLogger{ *; }
+-keepclassmembers class * extends com.jeefo.android.jeefologger.PersistentTag{ *; }
+-keepclassmembers class * extends com.jeefo.android.jeefologger.SmartLogger{ *; }
+-keepclassmembers class * extends com.jeefo.android.jeefologger.SmartLoggerFactory{ *; }
