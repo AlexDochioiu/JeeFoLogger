@@ -18,6 +18,7 @@ package com.jeefo.android.jeefologger;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.util.Log;
 
 /**
  * Created by Alexandru Iustin Dochioiu on 6/3/2018
@@ -36,7 +37,7 @@ public class SmartLoggerFactory {
      * @return a new {@link SmartLogger} which will not have an instance tag
      */
     @NonNull
-    public static SmartLogger createSmartLogger() {
+    public static ILog createSmartLogger() {
         return new SmartLogger(false);
     }
 
@@ -57,7 +58,7 @@ public class SmartLoggerFactory {
      * @return a newly created {@link SmartLogger}
      */
     @NonNull
-    public static SmartLogger createSmartLogger(boolean addInstanceTag) {
+    public static ILog createSmartLogger(boolean addInstanceTag) {
         return new SmartLogger(addInstanceTag);
     }
 
@@ -66,15 +67,26 @@ public class SmartLoggerFactory {
      * @return the {@link SmartLogger} extended with new tags (and no instance tag added)
      */
     @NonNull
-    public static SmartLogger createSmartLogger(@Nullable ILog logger) {
-        if (logger instanceof SmartLogger) {
-            if (isSameClass((SmartLogger) logger)) {
-                return (SmartLogger) logger;
+    public static ILog createSmartLogger(@Nullable ILog logger) {
+        if (logger == null) {
+            return new SmartLogger(null, false);
+        }
+
+        final IInternalLog internalLog = (IInternalLog) logger;
+        //noinspection ConstantConditions
+        if (internalLog == null) {
+            Log.wtf(JeefoLogger.TAG_LIBRARY_LOG, "SmartLoggerFactory: ILog cannot be converted to IInternalLog");
+            return logger;
+        }
+
+        if (internalLog instanceof SmartLogger) {
+            if (isSameClass((SmartLogger) internalLog)) {
+                return logger;
             } else {
-                return new SmartLogger(logger, false);
+                return new SmartLogger(internalLog, false);
             }
         } else {
-            return new SmartLogger(logger, false);
+            return new SmartLogger(internalLog, false);
         }
     }
 
@@ -96,15 +108,26 @@ public class SmartLoggerFactory {
      * @return the {@link SmartLogger} extended with new tags
      */
     @NonNull
-    public static SmartLogger createSmartLogger(@Nullable ILog logger, boolean addInstanceTag) {
-        if (logger instanceof SmartLogger) {
-            if (isSameClass((SmartLogger) logger)) {
-                return (SmartLogger) logger;
+    public static ILog createSmartLogger(@Nullable ILog logger, boolean addInstanceTag) {
+        if (logger == null) {
+            return new SmartLogger(null, addInstanceTag);
+        }
+
+        final IInternalLog internalLog = (IInternalLog) logger;
+        //noinspection ConstantConditions
+        if (internalLog == null) {
+            Log.wtf(JeefoLogger.TAG_LIBRARY_LOG, "SmartLoggerFactory: ILog cannot be converted to IInternalLog");
+            return logger;
+        }
+
+        if (internalLog instanceof SmartLogger) {
+            if (isSameClass((SmartLogger) internalLog)) {
+                return (SmartLogger) internalLog;
             } else {
-                return new SmartLogger(logger, addInstanceTag);
+                return new SmartLogger(internalLog, addInstanceTag);
             }
         } else {
-            return new SmartLogger(logger, addInstanceTag);
+            return new SmartLogger(internalLog, addInstanceTag);
         }
     }
 
@@ -116,7 +139,7 @@ public class SmartLoggerFactory {
      * @return true if the {@link SmartLogger} was created in the same class as the
      *          one which requested a new {@link SmartLogger}; false otherwise
      */
-    private static boolean isSameClass(SmartLogger smartLogger) {
+    private static boolean isSameClass(@NonNull SmartLogger smartLogger) {
         String upperClassName = smartLogger.getFullClientClassName();
         if (upperClassName.contains("$")) {
             upperClassName = upperClassName.substring(0, upperClassName.indexOf("$"));

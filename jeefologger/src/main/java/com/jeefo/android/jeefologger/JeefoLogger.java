@@ -22,98 +22,43 @@ import android.support.annotation.Nullable;
 import android.util.Log;
 
 import java.io.File;
-
-import static com.jeefo.android.jeefologger.StringUtils.getFormattedMessage;
+import java.lang.ref.WeakReference;
 
 /**
  * Created by Alexandru Iustin Dochioiu on 02/01/18.
  */
-@SuppressWarnings("WeakerAccess")
-public class JeefoLogger implements ILog {
-
-    public static final int TAG_ID_NOT_FOUND = PersistentTagsManager.TAG_ID_NOT_FOUND;
-    public static final int TAG_ID_IS_NULL = PersistentTagsManager.TAG_ID_IS_NULL;
-    public static final int TAG_REMOVED = PersistentTagsManager.TAG_REMOVED;
-
-    private static final ILog persistentLogger = new PersistentLogger();
-
-    static final String loggingPrefix = "[JeeFo-Log]";
-    static String packageName = null;
+@SuppressWarnings({"WeakerAccess", "UnusedReturnValue", "unused"})
+public class JeefoLogger {
+    static final String TAG_LIBRARY_LOG = "[LIBRARY-ERROR-JEEFO]";
 
     /**
      * Public method used for initializing persistence. If persistence is not desired, do not
      * call this method.
      *
+     * <b>NOTE: This is now deprecated and will be removed entirely at the beginning of 2019. USE
+     * {@link JeefoLogger.Builder} instead</b>
+     *
      * @param context any kind of context.
      * @throws IllegalArgumentException if the context is null and the persistence has not
      *                                  already been initialized
      */
+    @Deprecated
     public static void initPersistence(@NonNull Context context) {
-        PersistentLogger.init(context);
-        initLazyLogger(context);
+        PersistentLogger.init(context, LogLevel.VERBOSE);
     }
 
     /**
      * Public method used for initializing the debug logger. This does not need to be called
      * if the {@link JeefoLogger#initPersistence(Context)} is called
      *
+     * <b>NOTE: This is now deprecated and will be removed entirely at the beginning of 2019. USE
+     * {@link JeefoLogger.Builder} instead</b>
+     *
      * @param context any kind of context
      */
-    public static void initLazyLogger(@NonNull Context context) { packageName = context.getPackageName(); }
-
-    @Override
-    public void Debug(String messageToLog, Object... args) {
-        String finalMessage = getFormattedMessage(null, messageToLog, args);
-        Log.d(loggingPrefix + PersistentTagsManager.getTagsStringPrefix(), finalMessage);
-        persistentLogger.Debug(finalMessage);
-    }
-
-    @Override
-    public void Debug(Exception exception, String messageToLog, Object... args) {
-        String finalMessage = getFormattedMessage(exception, messageToLog, args);
-        Log.d(loggingPrefix + PersistentTagsManager.getTagsStringPrefix(), finalMessage);
-        persistentLogger.Debug(finalMessage);
-    }
-
-    @Override
-    public void Info(String messageToLog, Object... args) {
-        String finalMessage = getFormattedMessage(null, messageToLog, args);
-        Log.i(loggingPrefix + PersistentTagsManager.getTagsStringPrefix(), finalMessage);
-        persistentLogger.Info(finalMessage);
-    }
-
-    @Override
-    public void Warn(String messageToLog, Object... args) {
-        String finalMessage = getFormattedMessage(null, messageToLog, args);
-        Log.w(loggingPrefix + PersistentTagsManager.getTagsStringPrefix(), finalMessage);
-        persistentLogger.Warn(finalMessage);
-    }
-
-    @Override
-    public void Warn(Exception exception, String messageToLog, Object... args) {
-        String finalMessage = getFormattedMessage(exception, messageToLog, args);
-        Log.w(loggingPrefix + PersistentTagsManager.getTagsStringPrefix(), finalMessage);
-        persistentLogger.Warn(finalMessage);
-    }
-
-    @Override
-    public void Error(String messageToLog, Object... args) {
-        String finalMessage = getFormattedMessage(null, messageToLog, args);
-        Log.e(loggingPrefix + PersistentTagsManager.getTagsStringPrefix(), finalMessage);
-        persistentLogger.Error(finalMessage);
-    }
-
-    @Override
-    public void Error(Exception exception, String messageToLog, Object... args) {
-        String finalMessage = getFormattedMessage(exception, messageToLog, args);
-        Log.e(loggingPrefix + PersistentTagsManager.getTagsStringPrefix(), finalMessage);
-        persistentLogger.Error(finalMessage);
-    }
-
-    @Override
-    public void Error(Exception exception) {
-        Log.e(loggingPrefix + PersistentTagsManager.getTagsStringPrefix(), getFormattedMessage(exception, null));
-        persistentLogger.Error(exception);
+    @Deprecated
+    public static void initLazyLogger(@NonNull Context context) {
+        LazyLogger.packageName = context.getPackageName();
     }
 
     /**
@@ -147,9 +92,9 @@ public class JeefoLogger implements ILog {
      * Used for removing a particular persistent tag
      *
      * @param uniqueTagIdentifier the {@link String} unique identifier for the tag to be remove
-     * @return {@value TAG_ID_NOT_FOUND} if the {@link String} identifier is not known;
-     * {@value TAG_ID_IS_NULL} if the parameter is null;
-     * {@value TAG_REMOVED} if the tag was successfully removed
+     * @return {@value PersistentTagsManager#TAG_REMOVED} if the {@link String} identifier is not known;
+     * {@value PersistentTagsManager#TAG_ID_IS_NULL} if the parameter is null;
+     * {@value PersistentTagsManager#TAG_REMOVED} if the tag was successfully removed
      */
     public static int removePersistentTag(String uniqueTagIdentifier) {
         return PersistentTagsManager.removePersistentTag(uniqueTagIdentifier);
@@ -166,13 +111,127 @@ public class JeefoLogger implements ILog {
 
     /**
      * Each {@link File} object will have the name following the structure:
-     *                      yyyy_mm_dd_Log.txt
+     * yyyy_MM_dd_Log.txt
      *
      * @return array of all the log files as long as the persistent logging was initialized;
-     *              null if the persistent logging was not initialized
+     * null if the persistent logging was not initialized
      */
     @Nullable
     public static File[] getAllLogFiles() {
         return PersistentLogger.getAllLogFiles();
+    }
+
+    /**
+     * Private constructor as this should never be initialized
+     */
+    private JeefoLogger() {
+    }
+
+    /**
+     * Builder class for setting up the JeeFoLogger
+     */
+    public static class Builder {
+        WeakReference<Context> appContextWeakReference;
+
+        private boolean useLazyLogger = false;
+        private boolean usePersistence = false;
+        @LogLevel
+        private int minPersistenceLevel = LogLevel.VERBOSE;
+        @LogLevel
+        private int minLogcatLevel = LogLevel.VERBOSE;
+
+        @SuppressWarnings("ConstantConditions")
+        public Builder(@NonNull Context context) {
+            if (context == null) {
+                throw new IllegalArgumentException("Non-null context required!");
+            }
+
+            Context applicationContext;
+            if (context.getApplicationContext() != null) {
+                applicationContext = context.getApplicationContext();
+            } else {
+                applicationContext = context;
+            }
+
+            appContextWeakReference = new WeakReference<>(applicationContext);
+        }
+
+        /**
+         * Whether the lazy logger should be initialized. Generally, this can be set to true even
+         * when there's no current intention of using it as there's not really a memory/performance
+         * hit to it
+         *
+         * @param initLazyLogger whether the lazy logger should be initialized
+         * @return self to allow cascading
+         */
+        public Builder withLazyLogger(boolean initLazyLogger) {
+            this.useLazyLogger = initLazyLogger;
+            return this;
+        }
+
+        /**
+         * <b>NOTE:</b> The log files are not stored securely. I recommend turning this off when
+         * rolling out to production if there's any sensitive data getting logged.
+         *
+         * @param persistLogs whether persisting logs to file is desired
+         * @return self to allow cascading
+         */
+        public Builder withPersistence(boolean persistLogs) {
+            this.usePersistence = persistLogs;
+            return this;
+        }
+
+        /**
+         * <b>NOTE:</b> In order for the persistence to work, you should set the persistence to
+         * be used using {@link Builder#withPersistence(boolean)}
+         * <p>
+         * <b>NOTE:</b> The default log level is {@value LogLevel#VERBOSE}
+         *
+         * @param minimumPersistenceLevel minimum level for the messages to be saved persistently
+         * @return self to allow cascading
+         */
+        public Builder withMinimumPersistenceLevel(@LogLevel int minimumPersistenceLevel) {
+            this.minPersistenceLevel = minimumPersistenceLevel;
+            return this;
+        }
+
+        /**
+         * As an extra security measure, this can be set to {@value LogLevel#NONE} when rolling
+         * for production. That will ensure no message is passed to logcat ( so it cannot be
+         * intercepted )
+         * <p>
+         * <b>NOTE:</b> The default log level is {@value LogLevel#VERBOSE}
+         *
+         * @param minimumLogcatLevel minimum level for the messages to be passed onto logcat
+         * @return self to allow cascading
+         */
+        public Builder withMinimumLogcatLevel(@LogLevel int minimumLogcatLevel) {
+            this.minLogcatLevel = minimumLogcatLevel;
+            return this;
+        }
+
+        /**
+         * Called to build the JeeFoLogger settings and initialize it using them
+         */
+        public void buildAndInit() {
+            final Context context = appContextWeakReference.get();
+
+            if (context != null) {
+                FinalLogger.persistenceMinLevel = minPersistenceLevel;
+
+                if (useLazyLogger) {
+                    LazyLogger.packageName = context.getPackageName();
+                } else {
+                    LazyLogger.packageName = null;
+                }
+
+                PersistentLogger.setIsActive(usePersistence);
+                if (usePersistence) {
+                    PersistentLogger.init(context, minPersistenceLevel);
+                }
+            } else {
+                Log.w(TAG_LIBRARY_LOG, "Cannot initialize JeeFoLogger as the context was lost");
+            }
+        }
     }
 }

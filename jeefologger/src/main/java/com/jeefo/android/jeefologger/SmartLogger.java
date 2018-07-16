@@ -18,6 +18,7 @@ package com.jeefo.android.jeefologger;
 
 
 import android.support.annotation.Nullable;
+import android.util.Log;
 
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -70,21 +71,24 @@ class SmartLogger extends AbstractScopedLogger {
         addTag(TAG_KEY_CLASS, clientClassCaller, false);
 
         if (addInstanceTag) {
-            addTag(TAG_KEY_INSTANCE, UuidCustomUtils.generateShortUUID(), true);
+            try {
+                addTag(TAG_KEY_INSTANCE, UuidCustomUtils.generateShortUUID(), true);
+            } catch (IllegalArgumentException e) {
+                // I don't really expect to ever get here
+                Log.wtf(JeefoLogger.TAG_LIBRARY_LOG, "Failed to generate UID for instance tag");
+            }
         }
     }
 
     /**
      * Constructor
      *
-     * @param logger         the {@link ILog} to be extended with the new tags. can be either of
+     * @param logger         the {@link IInternalLog} to be extended with the new tags. can be either of
      *                       {@link ScopedLogger}, {@link SmartLogger} or {@link LazyLogger}.
      * @param addInstanceTag whether an instance tag is desired
      */
-    SmartLogger(@Nullable ILog logger, boolean addInstanceTag) {
+    SmartLogger(@Nullable IInternalLog logger, boolean addInstanceTag) {
         initLogger(logger);
-
-        //todo: check if logger class is the same as the top one. if that's the case, we should not add extra tags here
 
         String clientClassCaller;
 
@@ -92,14 +96,20 @@ class SmartLogger extends AbstractScopedLogger {
         clientClassCaller = SmartLoggerUtils.getSimpleClassName(5);
 
         addTag(TAG_KEY_CLASS, clientClassCaller, false);
+
         if (addInstanceTag) {
-            addTag(TAG_KEY_INSTANCE, UuidCustomUtils.generateShortUUID(), true);
+            try {
+                addTag(TAG_KEY_INSTANCE, UuidCustomUtils.generateShortUUID(), true);
+            } catch (IllegalArgumentException e) {
+                // I don't really expect to ever get here
+                Log.wtf(JeefoLogger.TAG_LIBRARY_LOG, "Failed to generate UID for instance tag");
+            }
         }
     }
 
     /**
      * @return the client class name (if the class is an anonymous class, it will give the class
-     *          name of the host where it was defined)
+     * name of the host where it was defined)
      */
     String getFullClientClassName() {
         return fullClientClassName;
@@ -115,7 +125,7 @@ class SmartLogger extends AbstractScopedLogger {
         StringBuilder messageLogPrefix = new StringBuilder();
         messageLogPrefix.append(getLoggingPrefix());
 
-        if (methodName != null && !methodName.equals("")) {
+        if (!methodName.equals("")) {
             messageLogPrefix.append("[").append(TAG_KEY_METHOD).append(" ").append(methodName).append("]");
         }
 
@@ -123,6 +133,37 @@ class SmartLogger extends AbstractScopedLogger {
         return messageLogPrefix.toString();
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @param messageToLog the message to be logged
+     * @param args         arguments for messageToLog
+     */
+    @Override
+    public void Verbose(String messageToLog, Object... args) {
+        try {
+            InternalVerbose(new LinkedList<>(Arrays.asList(Thread.currentThread().getStackTrace())), messageToLog, args);
+        } catch (Exception libraryException) {
+            Log.wtf(JeefoLogger.TAG_LIBRARY_LOG, StringUtils.getFormattedMessage(libraryException, "SmartLogger"));
+            Log.v(FinalLogger.TAG_LOGGING_PREFIX, StringUtils.getFormattedMessage(null, messageToLog, args));
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @param messageToLog the message to be logged
+     * @param args         arguments for messageToLog
+     */
+    @Override
+    public void Verbose(Exception exception, String messageToLog, Object... args) {
+        try {
+            InternalVerbose(new LinkedList<>(Arrays.asList(Thread.currentThread().getStackTrace())), exception, messageToLog, args);
+        } catch (Exception libraryException) {
+            Log.wtf(JeefoLogger.TAG_LIBRARY_LOG, StringUtils.getFormattedMessage(libraryException, "SmartLogger"));
+            Log.v(FinalLogger.TAG_LOGGING_PREFIX, StringUtils.getFormattedMessage(exception, messageToLog, args));
+        }
+    }
 
     /**
      * {@inheritDoc}
@@ -132,11 +173,12 @@ class SmartLogger extends AbstractScopedLogger {
      */
     @Override
     public synchronized void Debug(String messageToLog, Object... args) {
-        DebugReflection(
-                new LinkedList<>(Arrays.asList(Thread.currentThread().getStackTrace())),
-                messageToLog,
-                args
-        );
+        try {
+            InternalDebug(new LinkedList<>(Arrays.asList(Thread.currentThread().getStackTrace())), messageToLog, args);
+        } catch (Exception libraryException) {
+            Log.wtf(JeefoLogger.TAG_LIBRARY_LOG, StringUtils.getFormattedMessage(libraryException, "SmartLogger"));
+            Log.d(FinalLogger.TAG_LOGGING_PREFIX, StringUtils.getFormattedMessage(null, messageToLog, args));
+        }
     }
 
     /**
@@ -148,12 +190,12 @@ class SmartLogger extends AbstractScopedLogger {
      */
     @Override
     public synchronized void Debug(Exception exception, String messageToLog, Object... args) {
-        DebugReflection(
-                new LinkedList<>(Arrays.asList(Thread.currentThread().getStackTrace())),
-                exception,
-                messageToLog,
-                args
-        );
+        try {
+            InternalDebug(new LinkedList<>(Arrays.asList(Thread.currentThread().getStackTrace())), exception, messageToLog, args);
+        } catch (Exception libraryException) {
+            Log.wtf(JeefoLogger.TAG_LIBRARY_LOG, StringUtils.getFormattedMessage(libraryException, "SmartLogger"));
+            Log.d(FinalLogger.TAG_LOGGING_PREFIX, StringUtils.getFormattedMessage(exception, messageToLog, args));
+        }
     }
 
     /**
@@ -164,11 +206,12 @@ class SmartLogger extends AbstractScopedLogger {
      */
     @Override
     public synchronized void Info(String messageToLog, Object... args) {
-        InfoReflection(
-                new LinkedList<>(Arrays.asList(Thread.currentThread().getStackTrace())),
-                messageToLog,
-                args
-        );
+        try {
+            InternalInfo(new LinkedList<>(Arrays.asList(Thread.currentThread().getStackTrace())), messageToLog, args);
+        } catch (Exception libraryException) {
+            Log.wtf(JeefoLogger.TAG_LIBRARY_LOG, StringUtils.getFormattedMessage(libraryException, "SmartLogger"));
+            Log.i(FinalLogger.TAG_LOGGING_PREFIX, StringUtils.getFormattedMessage(null, messageToLog, args));
+        }
     }
 
     /**
@@ -179,11 +222,12 @@ class SmartLogger extends AbstractScopedLogger {
      */
     @Override
     public synchronized void Warn(String messageToLog, Object... args) {
-        WarnReflection(
-                new LinkedList<>(Arrays.asList(Thread.currentThread().getStackTrace())),
-                messageToLog,
-                args
-        );
+        try {
+            InternalWarn(new LinkedList<>(Arrays.asList(Thread.currentThread().getStackTrace())), messageToLog, args);
+        } catch (Exception libraryException) {
+            Log.wtf(JeefoLogger.TAG_LIBRARY_LOG, StringUtils.getFormattedMessage(libraryException, "SmartLogger"));
+            Log.w(FinalLogger.TAG_LOGGING_PREFIX, StringUtils.getFormattedMessage(null, messageToLog, args));
+        }
     }
 
     /**
@@ -195,12 +239,12 @@ class SmartLogger extends AbstractScopedLogger {
      */
     @Override
     public synchronized void Warn(Exception exception, String messageToLog, Object... args) {
-        WarnReflection(
-                new LinkedList<>(Arrays.asList(Thread.currentThread().getStackTrace())),
-                exception,
-                messageToLog,
-                args
-        );
+        try {
+            InternalWarn(new LinkedList<>(Arrays.asList(Thread.currentThread().getStackTrace())), exception, messageToLog, args);
+        } catch (Exception libraryException) {
+            Log.wtf(JeefoLogger.TAG_LIBRARY_LOG, StringUtils.getFormattedMessage(libraryException, "SmartLogger"));
+            Log.w(FinalLogger.TAG_LOGGING_PREFIX, StringUtils.getFormattedMessage(exception, messageToLog, args));
+        }
     }
 
     /**
@@ -211,11 +255,12 @@ class SmartLogger extends AbstractScopedLogger {
      */
     @Override
     public synchronized void Error(String messageToLog, Object... args) {
-        ErrorReflection(
-                new LinkedList<>(Arrays.asList(Thread.currentThread().getStackTrace())),
-                messageToLog,
-                args
-        );
+        try {
+            InternalError(new LinkedList<>(Arrays.asList(Thread.currentThread().getStackTrace())), messageToLog, args);
+        } catch (Exception libraryException) {
+            Log.wtf(JeefoLogger.TAG_LIBRARY_LOG, StringUtils.getFormattedMessage(libraryException, "SmartLogger"));
+            Log.e(FinalLogger.TAG_LOGGING_PREFIX, StringUtils.getFormattedMessage(null, messageToLog, args));
+        }
     }
 
     /**
@@ -227,11 +272,12 @@ class SmartLogger extends AbstractScopedLogger {
      */
     @Override
     public synchronized void Error(Exception exception, String messageToLog, Object... args) {
-        ErrorReflection(new LinkedList<>(Arrays.asList(Thread.currentThread().getStackTrace())),
-                exception,
-                messageToLog,
-                args
-        );
+        try {
+            InternalError(new LinkedList<>(Arrays.asList(Thread.currentThread().getStackTrace())), exception, messageToLog, args);
+        } catch (Exception libraryException) {
+            Log.wtf(JeefoLogger.TAG_LIBRARY_LOG, StringUtils.getFormattedMessage(libraryException, "SmartLogger"));
+            Log.e(FinalLogger.TAG_LOGGING_PREFIX, StringUtils.getFormattedMessage(exception, messageToLog, args));
+        }
     }
 
     /**
@@ -241,10 +287,41 @@ class SmartLogger extends AbstractScopedLogger {
      */
     @Override
     public synchronized void Error(Exception exception) {
-        ErrorReflection(
-                new LinkedList<>(Arrays.asList(Thread.currentThread().getStackTrace())),
-                exception,
-                ""
-        );
+        try {
+            InternalError(new LinkedList<>(Arrays.asList(Thread.currentThread().getStackTrace())), exception, "");
+        } catch (Exception libraryException) {
+            Log.wtf(JeefoLogger.TAG_LIBRARY_LOG, StringUtils.getFormattedMessage(libraryException, "SmartLogger"));
+            Log.e(FinalLogger.TAG_LOGGING_PREFIX, StringUtils.getFormattedMessage(exception, ""));
+        }
+    }
+
+    @Override
+    public void Wtf(String messageToLog, Object... args) {
+        try {
+            InternalWtf(new LinkedList<>(Arrays.asList(Thread.currentThread().getStackTrace())), messageToLog, args);
+        } catch (Exception libraryException) {
+            Log.wtf(JeefoLogger.TAG_LIBRARY_LOG, StringUtils.getFormattedMessage(libraryException, "SmartLogger"));
+            Log.wtf(FinalLogger.TAG_LOGGING_PREFIX, StringUtils.getFormattedMessage(null, messageToLog, args));
+        }
+    }
+
+    @Override
+    public void Wtf(Exception exception, String messageToLog, Object... args) {
+        try {
+            InternalWtf(new LinkedList<>(Arrays.asList(Thread.currentThread().getStackTrace())), exception, messageToLog, args);
+        } catch (Exception libraryException) {
+            Log.wtf(JeefoLogger.TAG_LIBRARY_LOG, StringUtils.getFormattedMessage(libraryException, "SmartLogger"));
+            Log.wtf(FinalLogger.TAG_LOGGING_PREFIX, StringUtils.getFormattedMessage(exception, messageToLog, args));
+        }
+    }
+
+    @Override
+    public void Wtf(Exception exception) {
+        try {
+            InternalWtf(new LinkedList<>(Arrays.asList(Thread.currentThread().getStackTrace())), exception, "");
+        } catch (Exception libraryException) {
+            Log.wtf(JeefoLogger.TAG_LIBRARY_LOG, StringUtils.getFormattedMessage(libraryException, "SmartLogger"));
+            Log.wtf(FinalLogger.TAG_LOGGING_PREFIX, StringUtils.getFormattedMessage(exception, ""));
+        }
     }
 }
