@@ -25,6 +25,7 @@ import java.util.List;
 /**
  * Created by Alexandru Iustin Dochioiu on 5/27/2018
  */
+@SuppressWarnings("WeakerAccess")
 final class PersistentTagsManager {
 
     public static final int TAG_ID_IS_NULL = -1;

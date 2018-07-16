@@ -35,17 +35,16 @@ class LazyLoggerInternal extends AbstractScopedLogger {
     }
 
     /**
-     * @return the prefix containing the tags
-     * @throws ExceptionInInitializerError if this method is called before JeefoLogger.initLazyLogger(Context)
+     * @return the prefix containing the tags or a LazyLoggerNotInitialized tag if that's the case
      */
     @Override
     String getMessageLogPrefix() {
-        if (JeefoLogger.packageName == null) {
-            throw new ExceptionInInitializerError("JeefoLogger.initLazyLogger(Context) should have been called before logging a message with this logger");
+        if (LazyLogger.packageName == null) {
+            return "[LazyLoggerNotInitialized]";
         }
         StringBuilder logPrefix = new StringBuilder();
 
-        List<Pair<String, LinkedList<String>>> traces = LazyLoggerUtils.getAllTraceForPackage(JeefoLogger.packageName);
+        List<Pair<String, LinkedList<String>>> traces = LazyLoggerUtils.getAllTraceForPackage(LazyLogger.packageName);
 
         for (Pair<String, LinkedList<String>> trace : traces) {
             logPrefix.append("[").append(TAG_KEY_CLASS).append(" ").append(trace.first).append("]");
@@ -60,82 +59,121 @@ class LazyLoggerInternal extends AbstractScopedLogger {
     /**
      * @param messageToLog the message to be logged
      * @param args         arguments for messageToLog
-     * @throws ExceptionInInitializerError if this method is called before JeefoLogger.initLazyLogger(Context)
+     */
+    @Override
+    public void Verbose(String messageToLog, Object... args) {
+        InternalVerbose((LinkedList) null, messageToLog, args);
+    }
+
+    /**
+     * @param exception    the exception to be logged
+     * @param messageToLog the message to be logged
+     * @param args         arguments for messageToLog
+     */
+    @Override
+    public void Verbose(Exception exception, String messageToLog, Object... args) {
+        InternalVerbose((LinkedList) null, exception, messageToLog, args);
+    }
+
+    /**
+     * @param messageToLog the message to be logged
+     * @param args         arguments for messageToLog
      */
     @Override
     public void Debug(String messageToLog, Object... args) {
-        DebugReflection((LinkedList) null, messageToLog, args);
+        InternalDebug((LinkedList) null, messageToLog, args);
     }
 
     /**
      * @param exception    the exception to be logged
      * @param messageToLog the message to be logged
      * @param args         arguments for messageToLog
-     * @throws ExceptionInInitializerError if this method is called before JeefoLogger.initLazyLogger(Context)
      */
     @Override
     public void Debug(Exception exception, String messageToLog, Object... args) {
-        DebugReflection((LinkedList) null, exception, messageToLog, args);
+        InternalDebug((LinkedList) null, exception, messageToLog, args);
     }
 
     /**
      * @param messageToLog the message to be logged
      * @param args         arguments for messageToLog
-     * @throws ExceptionInInitializerError if this method is called before JeefoLogger.initLazyLogger(Context)
      */
     @Override
     public void Info(String messageToLog, Object... args) {
-        InfoReflection((LinkedList) null, messageToLog, args);
+        InternalInfo((LinkedList) null, messageToLog, args);
     }
 
     /**
      * @param messageToLog the message to be logged
      * @param args         arguments for messageToLog
-     * @throws ExceptionInInitializerError if this method is called before JeefoLogger.initLazyLogger(Context)
      */
     @Override
     public void Warn(String messageToLog, Object... args) {
-        WarnReflection((LinkedList) null, messageToLog, args);
+        InternalWarn((LinkedList) null, messageToLog, args);
     }
 
     /**
      * @param exception    the exception to be logged
      * @param messageToLog the message to be logged
      * @param args         arguments for messageToLog
-     * @throws ExceptionInInitializerError if this method is called before JeefoLogger.initLazyLogger(Context)
      */
     @Override
     public void Warn(Exception exception, String messageToLog, Object... args) {
-        WarnReflection((LinkedList) null, exception, messageToLog, args);
+        InternalWarn((LinkedList) null, exception, messageToLog, args);
     }
 
     /**
      * @param messageToLog the message to be logged
      * @param args         arguments for messageToLog
-     * @throws ExceptionInInitializerError if this method is called before JeefoLogger.initLazyLogger(Context)
      */
     @Override
     public void Error(String messageToLog, Object... args) {
-        ErrorReflection((LinkedList) null, messageToLog, args);
+        InternalError((LinkedList) null, messageToLog, args);
     }
 
     /**
      * @param exception    the exception to be logged
      * @param messageToLog the message to be logged
      * @param args         arguments for messageToLog
-     * @throws ExceptionInInitializerError if this method is called before JeefoLogger.initLazyLogger(Context)
      */
     @Override
     public void Error(Exception exception, String messageToLog, Object... args) {
-        ErrorReflection((LinkedList) null, exception, messageToLog, args);
+        InternalError((LinkedList) null, exception, messageToLog, args);
     }
 
     /**
      * @param exception the exception to be logged
-     * @throws ExceptionInInitializerError if this method is called before JeefoLogger.initLazyLogger(Context)
      */
     @Override
     public void Error(Exception exception) {
-        ErrorReflection((LinkedList) null, exception, "");
+        InternalError((LinkedList) null, exception, "");
+    }
+
+    /**
+     * @param messageToLog the message to be logged
+     * @param args         arguments for messageToLog
+     */
+    @Override
+    public void Wtf(String messageToLog, Object... args) {
+        InternalWtf((LinkedList) null, messageToLog, args);
+
+    }
+
+    /**
+     * @param exception    the exception to be logged
+     * @param messageToLog the message to be logged
+     * @param args         arguments for messageToLog
+     */
+    @Override
+    public void Wtf(Exception exception, String messageToLog, Object... args) {
+        InternalWtf((LinkedList) null, exception, messageToLog, args);
+    }
+
+    /**
+     * @param exception the exception to be logged
+     */
+    @Override
+    public void Wtf(Exception exception) {
+        InternalWtf((LinkedList) null, exception, "");
     }
 }
