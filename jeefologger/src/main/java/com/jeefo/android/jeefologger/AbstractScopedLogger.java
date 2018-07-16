@@ -18,22 +18,22 @@ package com.jeefo.android.jeefologger;
 
 import android.support.annotation.Nullable;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.LinkedList;
 import java.util.Locale;
 
 /**
  * Created by Alexandru Iustin Dochioiu on 5/27/2018
  */
-abstract class AbstractScopedLogger implements ILog {
+abstract class AbstractScopedLogger implements ILog, IInternalLog {
     final static String TAG_KEY_INSTANCE = "Instance";
     final static String TAG_KEY_CLASS = "Class";
     final static String TAG_KEY_METHOD = "Method";
 
+    // Used by classes extending this one
     LinkedList<StackTraceElement> traceElements = null;
 
     private String loggingPrefix = "";
-    protected ILog logger;
+    protected IInternalLog logger;
 
     final String getLoggingPrefix() {
         return loggingPrefix;
@@ -50,6 +50,7 @@ abstract class AbstractScopedLogger implements ILog {
      * @param key                     the {@link String} matching the KEY field
      * @param value                   the {@link String} matching the VALUE field
      * @param throwOnNullOrEmptyValue boolean indicating whether a null value param is acceptable
+     * @throws IllegalArgumentException for null <i>value</i> IF <i>throwOnNullOrEmptyValue</i> is true
      */
     final synchronized void addTag(String key, String value, boolean throwOnNullOrEmptyValue) {
         if (value == null || value.equals("")) {
@@ -64,173 +65,82 @@ abstract class AbstractScopedLogger implements ILog {
     }
 
     /**
-     * Used for initiating the {@link ILog} member using the passed param if not null; otherwise
+     * Used for initiating the {@link IInternalLog} member using the passed param if not null; otherwise
      * a new {@link JeefoLogger} is created
      *
-     * @param logger the {@link ILog} to be stored or null to create a new instance of {@link JeefoLogger}
+     * @param logger the {@link IInternalLog} to be stored or null to create a new instance of {@link JeefoLogger}
      */
-    final synchronized void initLogger(@Nullable ILog logger) {
+    final synchronized void initLogger(@Nullable IInternalLog logger) {
         if (logger == null) {
-            this.logger = new JeefoLogger();
+            this.logger = FinalLogger.getInstance();
         } else {
             this.logger = logger;
         }
     }
 
-    /**
-     * @param traceElements the stackTrace (can be null) used by the {@link SmartLogger} when
-     *                      computing the logging prefix
-     * @param messageToLog  the message to be logged
-     * @param args          arguments for messageToLog
-     */
-    synchronized void DebugReflection(@Nullable final LinkedList<StackTraceElement> traceElements, String messageToLog, Object... args) {
+    @Override
+    public final synchronized void InternalVerbose(@Nullable final LinkedList<StackTraceElement> traceElements, String messageToLog, Object... args) {
         this.traceElements = traceElements;
-
-        try {
-            logger.getClass().getSuperclass().getDeclaredMethod("DebugReflection",
-                    LinkedList.class, String.class, Object[].class)
-                    .invoke(logger, this.traceElements, getMessageLogPrefix() + messageToLog, args);
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        } catch (InvocationTargetException e) {
-            e.printStackTrace();
-        } catch (NoSuchMethodException e) {
-            logger.Debug(getMessageLogPrefix() + messageToLog, args);
-        }
+        logger.InternalVerbose(traceElements, getMessageLogPrefix() + messageToLog, args);
     }
 
-    /**
-     * @param traceElements the stackTrace (can be null) used by the {@link SmartLogger} when
-     *                      computing the logging prefix
-     * @param exception     the exception to be logged
-     * @param messageToLog  the message to be logged
-     * @param args          arguments for messageToLog
-     */
-    synchronized void DebugReflection(final LinkedList<StackTraceElement> traceElements, Exception exception, String messageToLog, Object... args) {
+    @Override
+    public final synchronized void InternalVerbose(@Nullable final LinkedList<StackTraceElement> traceElements, Exception exception, String messageToLog, Object... args) {
         this.traceElements = traceElements;
-
-        try {
-            logger.getClass().getSuperclass().getDeclaredMethod("DebugReflection",
-                    LinkedList.class, Exception.class, String.class, Object[].class)
-                    .invoke(logger, this.traceElements, exception, getMessageLogPrefix() + messageToLog, args);
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        } catch (InvocationTargetException e) {
-            e.printStackTrace();
-        } catch (NoSuchMethodException e) {
-            logger.Debug(exception, getMessageLogPrefix() + messageToLog, args);
-        }
+        logger.InternalVerbose(traceElements, exception, getMessageLogPrefix() + messageToLog, args);
     }
 
-    /**
-     * @param traceElements the stackTrace (can be null) used by the {@link SmartLogger} when
-     *                      computing the logging prefix
-     * @param messageToLog  the message to be logged
-     * @param args          arguments for messageToLog
-     */
-    synchronized void InfoReflection(final LinkedList<StackTraceElement> traceElements, String messageToLog, Object... args) {
+    @Override
+    public final synchronized void InternalDebug(@Nullable final LinkedList<StackTraceElement> traceElements, String messageToLog, Object... args) {
         this.traceElements = traceElements;
-
-        try {
-            logger.getClass().getSuperclass().getDeclaredMethod("InfoReflection",
-                    LinkedList.class, String.class, Object[].class)
-                    .invoke(logger, this.traceElements, getMessageLogPrefix() + messageToLog, args);
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        } catch (InvocationTargetException e) {
-            e.printStackTrace();
-        } catch (NoSuchMethodException e) {
-            logger.Info(getMessageLogPrefix() + messageToLog, args);
-        }
+        logger.InternalDebug(traceElements, getMessageLogPrefix() + messageToLog, args);
     }
 
-    /**
-     * @param traceElements the stackTrace (can be null) used by the {@link SmartLogger} when
-     *                      computing the logging prefix
-     * @param messageToLog  the message to be logged
-     * @param args          arguments for messageToLog
-     */
-    synchronized void WarnReflection(final LinkedList<StackTraceElement> traceElements, String messageToLog, Object... args) {
+    @Override
+    public final synchronized void InternalDebug(@Nullable final LinkedList<StackTraceElement> traceElements, Exception exception, String messageToLog, Object... args) {
         this.traceElements = traceElements;
-
-        try {
-            logger.getClass().getSuperclass().getDeclaredMethod("WarnReflection",
-                    LinkedList.class, String.class, Object[].class)
-                    .invoke(logger, this.traceElements, getMessageLogPrefix() + messageToLog, args);
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        } catch (InvocationTargetException e) {
-            e.printStackTrace();
-        } catch (NoSuchMethodException e) {
-            logger.Warn(getMessageLogPrefix() + messageToLog, args);
-        }
+        logger.InternalDebug(traceElements, exception, getMessageLogPrefix() + messageToLog, args);
     }
 
-    /**
-     * @param traceElements the stackTrace (can be null) used by the {@link SmartLogger} when
-     *                      computing the logging prefix
-     * @param exception     the exception to be logged
-     * @param messageToLog  the message to be logged
-     * @param args          arguments for messageToLog
-     */
-    synchronized void WarnReflection(final LinkedList<StackTraceElement> traceElements, Exception exception, String messageToLog, Object... args) {
+    @Override
+    public final synchronized void InternalInfo(@Nullable final LinkedList<StackTraceElement> traceElements, String messageToLog, Object... args) {
         this.traceElements = traceElements;
-
-        try {
-            logger.getClass().getSuperclass().getDeclaredMethod("WarnReflection",
-                    LinkedList.class, Exception.class, String.class, Object[].class)
-                    .invoke(logger, this.traceElements, exception, getMessageLogPrefix() + messageToLog, args);
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        } catch (InvocationTargetException e) {
-            e.printStackTrace();
-        } catch (NoSuchMethodException e) {
-            logger.Warn(exception, getMessageLogPrefix() + messageToLog, args);
-        }
+        logger.InternalInfo(traceElements, getMessageLogPrefix() + messageToLog, args);
     }
 
-    /**
-     * @param traceElements the stackTrace (can be null) used by the {@link SmartLogger} when
-     *                      computing the logging prefix
-     * @param messageToLog  the message to be logged
-     * @param args          arguments for messageToLog
-     */
-    synchronized void ErrorReflection(final LinkedList<StackTraceElement> traceElements, String messageToLog, Object... args) {
+    @Override
+    public final synchronized void InternalWarn(@Nullable final LinkedList<StackTraceElement> traceElements, String messageToLog, Object... args) {
         this.traceElements = traceElements;
-
-        try {
-            logger.getClass().getSuperclass().getDeclaredMethod("ErrorReflection",
-                    LinkedList.class, String.class, Object[].class)
-                    .invoke(logger, this.traceElements, getMessageLogPrefix() + messageToLog, args);
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        } catch (InvocationTargetException e) {
-            e.printStackTrace();
-        } catch (NoSuchMethodException e) {
-            logger.Error(getMessageLogPrefix() + messageToLog, args);
-        }
+        logger.InternalWarn(traceElements, getMessageLogPrefix() + messageToLog, args);
     }
 
-    /**
-     * @param traceElements the stackTrace (can be null) used by the {@link SmartLogger} when
-     *                      computing the logging prefix
-     * @param exception     the exception to be logged
-     * @param messageToLog  the message to be logged
-     * @param args          arguments for messageToLog
-     */
-    synchronized void ErrorReflection(final LinkedList<StackTraceElement> traceElements, Exception exception, String messageToLog, Object... args) {
+    @Override
+    public final synchronized void InternalWarn(@Nullable final LinkedList<StackTraceElement> traceElements, Exception exception, String messageToLog, Object... args) {
         this.traceElements = traceElements;
+        logger.InternalWarn(traceElements, exception, getMessageLogPrefix() + messageToLog, args);
+    }
 
-        try {
-            logger.getClass().getSuperclass().getDeclaredMethod("ErrorReflection",
-                    LinkedList.class, Exception.class, String.class, Object[].class)
-                    .invoke(logger, this.traceElements, exception, getMessageLogPrefix() + messageToLog, args);
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        } catch (InvocationTargetException e) {
-            e.printStackTrace();
-        } catch (NoSuchMethodException e) {
-            logger.Error(exception, getMessageLogPrefix() + messageToLog, args);
-        }
+    @Override
+    public final synchronized void InternalError(@Nullable final LinkedList<StackTraceElement> traceElements, String messageToLog, Object... args) {
+        this.traceElements = traceElements;
+        logger.InternalError(traceElements, getMessageLogPrefix() + messageToLog, args);
+    }
+
+    @Override
+    public final synchronized void InternalError(@Nullable final LinkedList<StackTraceElement> traceElements, Exception exception, String messageToLog, Object... args) {
+        this.traceElements = traceElements;
+        logger.InternalError(traceElements, exception, getMessageLogPrefix() + messageToLog, args);
+    }
+
+    @Override
+    public final synchronized void InternalWtf(@Nullable final LinkedList<StackTraceElement> traceElements, String messageToLog, Object... args) {
+        this.traceElements = traceElements;
+        logger.InternalWtf(traceElements, getMessageLogPrefix() + messageToLog, args);
+    }
+
+    @Override
+    public final synchronized void InternalWtf(@Nullable final LinkedList<StackTraceElement> traceElements, Exception exception, String messageToLog, Object... args) {
+        this.traceElements = traceElements;
+        logger.InternalWtf(traceElements, exception, getMessageLogPrefix() + messageToLog, args);
     }
 }
