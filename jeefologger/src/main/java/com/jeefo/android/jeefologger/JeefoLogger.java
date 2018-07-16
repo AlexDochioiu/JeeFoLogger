@@ -29,7 +29,7 @@ import java.lang.ref.WeakReference;
  */
 @SuppressWarnings({"WeakerAccess", "UnusedReturnValue", "unused"})
 public class JeefoLogger {
-    static final String TAG_LIBRARY_LOG = "[LIBRARY-ERROR-JEEFO]";
+    static final String TAG_LIBRARY_LOG = "[LIB-JEEFO]";
 
     /**
      * Public method used for initializing persistence. If persistence is not desired, do not
