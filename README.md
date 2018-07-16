@@ -33,7 +33,7 @@ JeeFo Logger is an android library which would drasticly improve the quality of 
 ```groovy
 // Add JeeFo Logger dependencies
 dependencies {
-  compile 'com.jeefo.android:jeefologger:1.0.1'
+  compile 'com.jeefo.android:jeefologger:1.1.0'
 }
 ```
 
