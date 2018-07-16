@@ -15,7 +15,7 @@ import static com.jeefo.android.jeefologger.StringUtils.getFormattedMessage;
 public class FinalLogger implements IInternalLog {
     static final String TAG_LOGGING_PREFIX = "[JeeFo-Log]";
     @LogLevel
-    static int persistenceMinLevel = LogLevel.VERBOSE;
+    static int logcatMinLevel = LogLevel.VERBOSE;
 
     private static final ILog persistentLogger = PersistentLogger.getInstance();
 
@@ -40,7 +40,7 @@ public class FinalLogger implements IInternalLog {
     @Override
     public void InternalVerbose(@Nullable LinkedList<StackTraceElement> traceElements, String messageToLog, Object... args) {
         String finalMessage = getFormattedMessage(null, messageToLog, args);
-        if (persistenceMinLevel <= LogLevel.VERBOSE) {
+        if (logcatMinLevel <= LogLevel.VERBOSE) {
             Log.v(TAG_LOGGING_PREFIX + PersistentTagsManager.getTagsStringPrefix(), finalMessage);
         }
         persistentLogger.Verbose(finalMessage);
@@ -49,7 +49,7 @@ public class FinalLogger implements IInternalLog {
     @Override
     public void InternalVerbose(@Nullable LinkedList<StackTraceElement> traceElements, Exception exception, String messageToLog, Object... args) {
         String finalMessage = getFormattedMessage(exception, messageToLog, args);
-        if (persistenceMinLevel <= LogLevel.VERBOSE) {
+        if (logcatMinLevel <= LogLevel.VERBOSE) {
             Log.v(TAG_LOGGING_PREFIX + PersistentTagsManager.getTagsStringPrefix(), finalMessage);
         }
         persistentLogger.Verbose(finalMessage);
@@ -58,7 +58,7 @@ public class FinalLogger implements IInternalLog {
     @Override
     public void InternalDebug(@Nullable LinkedList<StackTraceElement> traceElements, String messageToLog, Object... args) {
         String finalMessage = getFormattedMessage(null, messageToLog, args);
-        if (persistenceMinLevel <= LogLevel.DEBUG) {
+        if (logcatMinLevel <= LogLevel.DEBUG) {
             Log.d(TAG_LOGGING_PREFIX + PersistentTagsManager.getTagsStringPrefix(), finalMessage);
         }
         persistentLogger.Debug(finalMessage);
@@ -67,7 +67,7 @@ public class FinalLogger implements IInternalLog {
     @Override
     public void InternalDebug(@Nullable LinkedList<StackTraceElement> traceElements, Exception exception, String messageToLog, Object... args) {
         String finalMessage = getFormattedMessage(exception, messageToLog, args);
-        if (persistenceMinLevel <= LogLevel.DEBUG) {
+        if (logcatMinLevel <= LogLevel.DEBUG) {
             Log.d(TAG_LOGGING_PREFIX + PersistentTagsManager.getTagsStringPrefix(), finalMessage);
         }
         persistentLogger.Debug(finalMessage);
@@ -76,7 +76,7 @@ public class FinalLogger implements IInternalLog {
     @Override
     public void InternalInfo(@Nullable LinkedList<StackTraceElement> traceElements, String messageToLog, Object... args) {
         String finalMessage = getFormattedMessage(null, messageToLog, args);
-        if (persistenceMinLevel <= LogLevel.INFO) {
+        if (logcatMinLevel <= LogLevel.INFO) {
             Log.i(TAG_LOGGING_PREFIX + PersistentTagsManager.getTagsStringPrefix(), finalMessage);
         }
         persistentLogger.Info(finalMessage);
@@ -85,7 +85,7 @@ public class FinalLogger implements IInternalLog {
     @Override
     public void InternalWarn(@Nullable LinkedList<StackTraceElement> traceElements, String messageToLog, Object... args) {
         String finalMessage = getFormattedMessage(null, messageToLog, args);
-        if (persistenceMinLevel <= LogLevel.WARN) {
+        if (logcatMinLevel <= LogLevel.WARN) {
             Log.w(TAG_LOGGING_PREFIX + PersistentTagsManager.getTagsStringPrefix(), finalMessage);
         }
         persistentLogger.Warn(finalMessage);
@@ -94,7 +94,7 @@ public class FinalLogger implements IInternalLog {
     @Override
     public void InternalWarn(@Nullable LinkedList<StackTraceElement> traceElements, Exception exception, String messageToLog, Object... args) {
         String finalMessage = getFormattedMessage(exception, messageToLog, args);
-        if (persistenceMinLevel <= LogLevel.WARN) {
+        if (logcatMinLevel <= LogLevel.WARN) {
             Log.w(TAG_LOGGING_PREFIX + PersistentTagsManager.getTagsStringPrefix(), finalMessage);
         }
         persistentLogger.Warn(finalMessage);
@@ -103,7 +103,7 @@ public class FinalLogger implements IInternalLog {
     @Override
     public void InternalError(@Nullable LinkedList<StackTraceElement> traceElements, String messageToLog, Object... args) {
         String finalMessage = getFormattedMessage(null, messageToLog, args);
-        if (persistenceMinLevel <= LogLevel.ERROR) {
+        if (logcatMinLevel <= LogLevel.ERROR) {
             Log.e(TAG_LOGGING_PREFIX + PersistentTagsManager.getTagsStringPrefix(), finalMessage);
         }
         persistentLogger.Error(finalMessage);
@@ -112,7 +112,7 @@ public class FinalLogger implements IInternalLog {
     @Override
     public void InternalError(@Nullable LinkedList<StackTraceElement> traceElements, Exception exception, String messageToLog, Object... args) {
         String finalMessage = getFormattedMessage(exception, messageToLog, args);
-        if (persistenceMinLevel <= LogLevel.ERROR) {
+        if (logcatMinLevel <= LogLevel.ERROR) {
             Log.e(TAG_LOGGING_PREFIX + PersistentTagsManager.getTagsStringPrefix(), finalMessage);
         }
         persistentLogger.Error(finalMessage);
@@ -121,7 +121,7 @@ public class FinalLogger implements IInternalLog {
     @Override
     public void InternalWtf(@Nullable LinkedList<StackTraceElement> traceElements, String messageToLog, Object... args) {
         String finalMessage = getFormattedMessage(null, messageToLog, args);
-        if (persistenceMinLevel <= LogLevel.WTF) {
+        if (logcatMinLevel <= LogLevel.WTF) {
             Log.wtf(TAG_LOGGING_PREFIX + PersistentTagsManager.getTagsStringPrefix(), finalMessage);
         }
         persistentLogger.Wtf(finalMessage);
@@ -130,7 +130,7 @@ public class FinalLogger implements IInternalLog {
     @Override
     public void InternalWtf(@Nullable LinkedList<StackTraceElement> traceElements, Exception exception, String messageToLog, Object... args) {
         String finalMessage = getFormattedMessage(exception, messageToLog, args);
-        if (persistenceMinLevel <= LogLevel.WTF) {
+        if (logcatMinLevel <= LogLevel.WTF) {
             Log.wtf(TAG_LOGGING_PREFIX + PersistentTagsManager.getTagsStringPrefix(), finalMessage);
         }
         persistentLogger.Wtf(finalMessage);

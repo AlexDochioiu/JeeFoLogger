@@ -217,7 +217,8 @@ public class JeefoLogger {
             final Context context = appContextWeakReference.get();
 
             if (context != null) {
-                FinalLogger.persistenceMinLevel = minPersistenceLevel;
+
+                FinalLogger.logcatMinLevel = minLogcatLevel;
 
                 if (useLazyLogger) {
                     LazyLogger.packageName = context.getPackageName();

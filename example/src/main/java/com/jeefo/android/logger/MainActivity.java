@@ -22,6 +22,7 @@ import android.os.Bundle;
 
 import com.jeefo.android.jeefologger.ILog;
 import com.jeefo.android.jeefologger.JeefoLogger;
+import com.jeefo.android.jeefologger.LogLevel;
 import com.jeefo.android.jeefologger.SmartLoggerFactory;
 import com.jeefo.android.logger.utils.LazyLoggerDemonstrationUtils;
 import com.jeefo.android.logger.utils.OnMyExampleEventListener;
@@ -64,6 +65,8 @@ public class MainActivity extends AppCompatActivity {
         new JeefoLogger.Builder(this)
                 .withPersistence(true)
                 .withLazyLogger(true)
+                .withMinimumLogcatLevel(LogLevel.VERBOSE)
+                .withMinimumPersistenceLevel(LogLevel.VERBOSE)
                 .buildAndInit();
 
         // To fetch the log files at any point, use the following. This method currently works only after buildAndInit() but this will change in a future version
