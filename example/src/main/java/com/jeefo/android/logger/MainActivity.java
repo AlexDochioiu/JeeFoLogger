@@ -49,22 +49,25 @@ public class MainActivity extends AppCompatActivity {
 
         logger.Info("This message is logged before initializing persistence so it will not appear in the log file");
 
+
         // Setup the persistence for the logger
         // NOTE: Keep in mind that the log files are not stored securely and they can be easily
         //          accessed using a file manager software. Secured storage is planned for one
         //          of the future releases. Until then, you might want to keep persistence only
         //          for in-house testing and turn it off in the release (by removing the following
         //          line only - nothing else will be affected by it)
-        JeefoLogger.initPersistence(this);
-
-        // To fetch the log files at any point, use the following. This method currently works only after JeefoLogger.initPersistence() but this will change in a future version
-        // JeefoLogger.getAllLogFiles(); // THIS RETURNES AN ARRAY WITH THE LOG FILES ON THE DEVICE
-
+        //
         // Setup the lazy logger
         // NOTE: I would always add this line as it can never do harm. Without it, the lazy logger
-        // will throw when logging a message. If you check the implementation of that method, you
+        // will not work as expected. If you check the implementation of that method, you
         // will see that it's doing nothing more than identifying the base package of the module
-        JeefoLogger.initLazyLogger(this);
+        new JeefoLogger.Builder(this)
+                .withPersistence(true)
+                .withLazyLogger(true)
+                .buildAndInit();
+
+        // To fetch the log files at any point, use the following. This method currently works only after buildAndInit() but this will change in a future version
+        // JeefoLogger.getAllLogFiles(); // THIS RETURNES AN ARRAY WITH THE LOG FILES ON THE DEVICE
 
         logger.Debug("Persistence was initialized so from now on, all the log messages will be stored in the file as well");
         logger.Info("The name of today's log file is: %s_Log.txt", simpleDateFormat.format(new Date()));

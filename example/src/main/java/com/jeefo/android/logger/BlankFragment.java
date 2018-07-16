@@ -58,7 +58,7 @@ public class BlankFragment extends Fragment {
                 @Override
                 public void onCrashAndBurn() {
                     try {
-                        @SuppressWarnings("NumericOverflow")
+                        @SuppressWarnings({"NumericOverflow", "unused"})
                         int z = 10 / 0;
                     } catch (Exception exception) {
                         logger.Error(exception, "Did I mention you can log exceptions as well? Placeholders still work also: %s", "argument");

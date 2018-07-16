@@ -49,6 +49,12 @@ public class LazyLoggerUtils {
                 final String className = getClassNameFromFileName(ste[index].getFileName());
                 String methodName = ste[index].getMethodName() + "()";
 
+                if (methodName.contains("access$")) {
+                    // Those are compiler generated methods used for accessing members of a (host)
+                    // class from an anon class. We are not interested in displaying them
+                    continue;
+                }
+
                 if (packageCalls.size() > 0) {
                     if (className.equals(packageCalls.getLast().first)) {
                         if (!isAnonymousClass) {
