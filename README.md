@@ -41,12 +41,7 @@ dependencies {
 **In order to use LazyLogger and/or to persist the logs, you must initilize them. This needs doing only once using the JeeFoLogger builder. (This is not required unless you want to use persistence, lazylogger or to set the minimum logcat logging level different than VERBOSE)**
 
 ```groovy
-new JeefoLogger.Builder(context)
-                .withPersistence(true) // default is false
-                .withLazyLogger(true) // default is false
-				.withMinimumLogcatLevel(LogLevel.VERBOSE) // default is LogLevel.VERBOSE
-                .withMinimumPersistenceLevel(LogLevel.VERBOSE) // default is LogLevel.VERBOSE (this line will not do anything unless withPeristence(true) is used)
-                .buildAndInit();
+
 ```
 
 You must provide an Android `context`. A good place to initialize them is in `onCreate` on an application subclass:
@@ -55,8 +50,12 @@ public class MyApplication extends Application {
   @Override
   public void onCreate() {
     super.onCreate();
-    JeefoLogger.initPersistence(this);
-    JeefoLogger.initLazyLogger(this);
+    new JeefoLogger.Builder(context)
+                .withPersistence(true) // default is false
+                .withLazyLogger(true) // default is false
+		.withMinimumLogcatLevel(LogLevel.VERBOSE) // default is LogLevel.VERBOSE
+                .withMinimumPersistenceLevel(LogLevel.VERBOSE) // default is LogLevel.VERBOSE (this line will not do anything unless withPeristence(true) is used)
+                .buildAndInit();
   }
 }
 ```
